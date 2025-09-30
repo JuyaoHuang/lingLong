@@ -1,0 +1,13 @@
+---
+import PostArchiveLayout from "../layouts/PostArchiveLayout.astro";
+import I18nKeys from "../locales/keys";
+import { i18n } from "../locales/translation";
+import { GetArchives } from "../utils/content";
+
+const archiveMap = await GetArchives();
+---
+<!-- 归档/时间线 实例 -->
+<PostArchiveLayout
+  archiveMap={archiveMap}
+  title={i18n(I18nKeys.pages_archive_archive)}
+/>

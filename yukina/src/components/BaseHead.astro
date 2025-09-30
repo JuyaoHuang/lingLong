@@ -1,0 +1,61 @@
+---
+import YukinaConfig from "../../yukina.config";
+import GlobalStyles from "./GlobalStyles.astro";
+import ScriptSetup from "./ScriptSetup.astro";
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/1.ico" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Primary Meta Tags -->
+<title>{YukinaConfig.title}</title>
+<meta name="title" content={YukinaConfig.title} />
+<meta name="description" content={YukinaConfig.description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={YukinaConfig.title} />
+<meta property="og:description" content={YukinaConfig.description} />
+<!-- <meta property="og:image" content={new URL(image, Astro.url)} /> -->
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:title" content={YukinaConfig.title} />
+<meta property="twitter:description" content={YukinaConfig.description} />
+<!-- <meta property="twitter:image" content={new URL(image, Astro.url)} /> -->
+
+<!-- RSS AutoDiscovery -->
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={YukinaConfig.title}
+  href={new URL("rss.xml", Astro.site)}
+/>
+
+<!-- SiteMap -->
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+<!-- CSS -->
+<link
+  rel="stylesheet"
+  href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
+/>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.bunny.net" />
+<link
+  href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
+  rel="stylesheet"
+/>
+
+<GlobalStyles />
+<ScriptSetup />

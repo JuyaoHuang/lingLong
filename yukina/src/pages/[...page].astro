@@ -1,0 +1,66 @@
+---
+// Component imports
+// 这是一个在 Astro 项目中非常特殊且强大的文件，它的核心功能是实现网站主页的文章列表分页。
+// 如果您的博客有100篇文章，把它们全部显示在主页上会导致页面过长、加载缓慢。这个文件的作用就是将这100篇文章自动切分成多个页面，例如每页显示6篇。
+// 用户访问 https://你的域名.com/，看到的是第1页（最新的6篇文章）。
+// 用户访问 https://你的域名.com/2，看到的是第2页（第7到第12篇）。
+// 用户访问 https://你的域名.com/3，看到的是第3页，以此类推。
+// 这个文件就是创建所有这些分页页面的自动化模板。
+
+import Main from "../layouts/MainLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import Pagination from "../components/controllers/Pagination.astro";
+// Utils
+import type { PaginateFunction } from "astro";
+import { GetSortedPosts } from "../utils/content";//排序工具
+
+export async function getStaticPaths({
+  paginate,
+}: {
+  paginate: PaginateFunction;
+}) {
+  const postCollections = await GetSortedPosts();
+  return paginate(postCollections, { pageSize: 6 });//分页
+}
+const { page } = Astro.props;
+---
+
+<Main>
+  <div class="space-y-8">
+    <div class="w-full space-y-4">
+      {
+        page.data.map((entry, index) => (
+          <div
+            class="onload-animation"
+            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
+          >
+            {/* 修改：更新为支持二级分类的新接口 */}
+            {/* 原来使用 category={entry.data.first_level_category} */}
+            {/* 现在使用 first_level_category 和 second_level_category 分别传递 */}
+            <PostCard
+              id={entry.id}
+              title={entry.data.title}
+              published={entry.data.published}
+              first_level_category={entry.data.first_level_category}
+              second_level_category={entry.data.second_level_category}
+              tags={entry.data.tags}
+              description={entry.data.description}
+              image={entry.data.cover}
+              readingMetadata={
+                entry.data.readingMetadata
+              }
+            />
+          </div>
+        ))
+      }
+    </div>
+    <Pagination
+      class="onload-animation"
+      lastPage={page.lastPage}
+      current={page.currentPage}
+      prevURL={page.url.prev}
+      nextURL={page.url.next}
+      style={`animation-delay: calc(var(--onload-animation-delay) + ${page.data.length + 1} * var(--onload-animation-interval));`}
+    />
+  </div>
+</Main>

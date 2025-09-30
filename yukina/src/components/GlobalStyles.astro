@@ -1,0 +1,200 @@
+---
+import "../styles/animations.css";
+import "../styles/scrollbar.css";
+import "../styles/searchbar.css";
+import "overlayscrollbars/overlayscrollbars.css";
+---
+
+<style is:global>
+  :root {
+    --hue: 300;
+
+    --primary-color: oklch(70% 0.15 var(--hue));
+    --primary-color-lighten: oklch(95% 0.02 var(--hue));
+    --primary-color-hover: oklch(90% 0.025 var(--hue));
+    --primary-color-transparent: oklch(70% 0.15 var(--hue) / 15%);
+    --text-color: oklch(30% 0 0);
+    --text-color-lighten: oklch(50% 0 0);
+    --card-color: oklch(100% 0 0);
+    --card-color-transparent: oklch(100% 0 0 / 85%);
+    --background-color: oklch(97% 0.01 var(--hue));
+
+    --brand-font: "Raleway", "Noto Sans SC", sans-serif;
+    --primary-font: "Noto Sans SC", sans-serif;
+    --code-font: "JetBrains Mono", "Fira Code", monospace;
+
+    --page-width-lg: 992px;
+    --page-width-xl: 1264px;
+
+    --banner-height: 55vh;
+    --title-font: var(--brand-font);
+    --title-color: oklch(100% 0 0 / 95%);
+    --subtitle-font: var(--brand-font);
+    --subtitle-color: oklch(100% 0 0 / 85%);
+
+    --onload-animation-delay: 100ms;
+    --onload-animation-interval: 100ms;
+  }
+
+  :root.dark {
+    --primary-color: oklch(70% 0.125 var(--hue));
+    --primary-color-lighten: oklch(40% 0.04 var(--hue));
+    --primary-color-hover: oklch(20% 0.015 var(--hue));
+    --text-color: oklch(95% 0.002 var(--hue));
+    --text-color-lighten: oklch(90% 0.002 var(--hue));
+    --card-color: oklch(25% 0.02 var(--hue));
+    --card-color-lighten: oklch(40% 0.04 var(--hue));
+    --card-color-transparent: oklch(30% 0.025 var(--hue) / 85%);
+    --background-color: oklch(17.5% 0.015 var(--hue));
+  }
+
+  .swup-progress-bar {
+    height: 5px;
+    background-color: var(--primary-color);
+  }
+
+  /* 浮动TOC样式 - 支持纯JavaScript创建的TOC */
+  .floating-toc {
+    position: fixed !important;
+    top: 20%;
+    left: 0.5rem;
+    width: 280px;
+    max-height: 60vh;
+    background: #ddede3;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    z-index: 9999 !important;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* 深色模式支持 */
+  @media (prefers-color-scheme: dark) {
+    .floating-toc {
+      background: rgba(30, 30, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* TOC标题部分 */
+  .toc-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .toc-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.02);
+    }
+  }
+
+  .toc-header h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color, #333);
+    text-align: center;
+  }
+
+  /* TOC内容区域 */
+  .toc-content {
+    padding: 0.5rem 0;
+    max-height: calc(60vh - 60px);
+    overflow-y: auto;
+  }
+
+  /* 自定义滚动条样式 */
+  .toc-content::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .toc-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .toc-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+
+  /* TOC列表样式 */
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* TOC链接按钮样式 */
+  .toc-link {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1.25rem;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-color, #666);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 悬停效果 */
+  .toc-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color, #0066cc);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .toc-link:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--primary-color, #66aaff);
+    }
+  }
+
+  /* 激活状态样式 */
+  .toc-link.active {
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--primary-color, #0066cc);
+    border-left-color: var(--primary-color, #0066cc);
+    font-weight: 500;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .toc-link.active {
+      background: rgba(102, 170, 255, 0.1);
+      color: var(--primary-color, #66aaff);
+      border-left-color: var(--primary-color, #66aaff);
+    }
+  }
+
+  /* 响应式设计：中等屏幕隐藏 */
+  @media (max-width: 1200px) {
+    .floating-toc {
+      display: none;
+    }
+  }
+
+  /* 小屏幕设备隐藏 */
+  @media (max-width: 768px) {
+    .floating-toc {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,11 @@
+.result-item:hover {
+  @apply bg-[var(--primary-color-lighten)];
+}
+
+.result-item:hover .result-title {
+  @apply text-[var(--primary-color)];
+}
+
+.item-excerpt mark {
+  @apply bg-transparent font-bold text-[var(--primary-color)];
+}

@@ -1,0 +1,51 @@
+---
+import ChipLayout from "../../layouts/ChipLayout.astro"; // 【修正】根据改进要求，二级分类列表使用ChipLayout
+import { getCollection } from 'astro:content';
+import { IdToSlug } from "../../utils/hash"; // 确保你引入了 slug 工具
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  // 【关键修复】为所有不重复的一级分类创建页面，确保使用hash化的URL参数
+  const uniqueFirstCategories = [...new Set(allPosts.map(post => post.data.first_level_category))];
+
+  return uniqueFirstCategories.map(category => ({
+    params: { first_category: IdToSlug(category) }, // 【重要】使用hash化的URL参数，与链接生成保持一致
+    props: { categoryName: category } // 传递原始分类名用于显示和数据处理
+  }));
+}
+
+const { categoryName } = Astro.props; // 从 props 获取原始分类名
+const { first_category } = Astro.params; // 从 URL 获取 hash 化的分类名
+
+const allPosts = await getCollection('posts');
+
+// 1. 筛选出所有属于当前一级分类的文章
+const postsInThisCategory = allPosts.filter(post => post.data.first_level_category === categoryName);
+
+// 2. 从这些文章中，提取出所有不重复的二级分类
+const uniqueSecondCategories = [...new Set(postsInThisCategory.map(post => post.data.second_level_category))];
+
+// 3. 【核心改进】为每个二级分类创建chip数据，用于ChipLayout展示
+// 这里计算每个二级分类下的文章数量，用作chip的subChip显示
+const chips = uniqueSecondCategories.map((secondCategory) => {
+  const postsInSecondCategory = postsInThisCategory.filter(post =>
+    post.data.second_level_category === secondCategory
+  );
+
+  return {
+    name: secondCategory, // 二级分类的显示名称
+    // 【关键】构建正确的二级分类链接，格式：/categories/hash(一级分类)/hash(二级分类)
+    slug: `/categories/${first_category}/${IdToSlug(secondCategory)}`,
+    subChip: postsInSecondCategory.length.toString(), // 该二级分类下的文章数量
+  };
+});
+
+---
+
+<!-- 【重要修改】根据改进要求，二级分类列表使用ChipLayout -->
+<!-- 这将显示为类似主页分类展示的小卡片形式 -->
+<ChipLayout
+  chips={chips}
+  title={`板块: ${categoryName}`}
+  subTitle="请选择专题："
+/>

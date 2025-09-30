@@ -1,0 +1,37 @@
+---
+import { getEntry, render } from "astro:content";
+import Main from "../layouts/MainLayout.astro";
+import Markdown from "../components/Markdown.astro";
+import CopyRight from "../components/misc/CopyRight.astro";
+
+const aboutPost = await getEntry("specs", "about");
+const { Content } = await render(aboutPost!);
+interface Props {
+  title?: string;
+  subTitle?: string;
+  bannerImage?: string;
+  published?: Date;
+}
+const { title, subTitle, bannerImage, published } = Astro.props;
+---
+
+<Main title={title} subTitle={subTitle} bannerImage={bannerImage}>
+  <!-- <Fragment set:html={tocHTMLString} /> -->
+  <div class="article-wrapper">
+    <div class="article">
+      <Markdown>
+        <Content />
+      </Markdown>
+      {published && title && <CopyRight title={title} published={published} />}
+    </div>
+  </div>
+</Main>
+
+<style>
+  .article-wrapper {
+    @apply w-full rounded-2xl bg-[var(--card-color)] p-10;
+  }
+  .article {
+    @apply flex flex-col;
+  }
+</style>

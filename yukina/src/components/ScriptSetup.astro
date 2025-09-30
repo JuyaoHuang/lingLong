@@ -1,0 +1,190 @@
+---
+
+---
+
+<script>
+  import lozad from "lozad";
+  import { OverlayScrollbars } from "overlayscrollbars";
+
+  // setup post url
+  const setupUrlAnchor = () => {
+    const url = window.location.href;
+    const urlElement = document.getElementById("post-url") as HTMLAnchorElement;
+    if (urlElement) {
+      urlElement.href = url;
+      urlElement.innerText = url;
+    }
+  };
+
+  // setup lazy load for images
+  const setupLozad = () => {
+    const observer = lozad(".lozad", {
+      loaded: (el) => {
+        el.classList.add("loaded");
+      },
+    });
+
+    observer.observe();
+  };
+
+  // add global scroll bar
+  const setupScrollBar = () => {
+    OverlayScrollbars(
+      { target: document.body, cancel: { nativeScrollbarsOverlaid: true } },
+      {
+        scrollbars: {
+          theme: "scrollbar-base scrollbar-auto py-1",
+          autoHide: "move",
+        },
+      },
+    );
+    document.body.classList.remove("overflow-y-hidden");
+
+    // add scrollbar for code blocks
+    document.querySelectorAll("pre").forEach((ele) => {
+      OverlayScrollbars(ele, {
+        scrollbars: {
+          theme: "scrollbar-base scrollbar-dark px-2",
+          autoHide: "leave",
+          autoHideDelay: 500,
+          autoHideSuspend: false,
+        },
+      });
+    });
+  };
+
+  // 设置浮动目录
+  const setupFloatingTOC = () => {
+    // 移除旧的TOC
+    const existingTOC = document.querySelector('.floating-toc');
+    if (existingTOC) {
+      // 清理旧的observer
+      if ((existingTOC as any)._observer) {
+        (existingTOC as any)._observer.disconnect();
+      }
+      existingTOC.remove();
+    }
+
+    // 检查是否在文章页面
+    const isPostPage = window.location.pathname.startsWith('/posts/');
+    if (!isPostPage) {
+      return;
+    }
+
+    // 获取页面标题
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+      .filter(heading => heading.id) // 只要有ID的标题
+      .map(heading => ({
+        depth: parseInt(heading.tagName.charAt(1)),
+        text: heading.textContent?.trim() || '',
+        slug: heading.id
+      }));
+
+    if (headings.length === 0) {
+      return;
+    }
+
+    console.log('Creating FloatingTOC with', headings.length, 'headings');
+
+    // 创建TOC容器
+    const tocContainer = document.createElement('nav');
+    tocContainer.className = 'floating-toc';
+    tocContainer.setAttribute('role', 'navigation');
+    tocContainer.setAttribute('aria-label', '文章目录');
+
+    // 创建TOC HTML
+    tocContainer.innerHTML = `
+      <div class="toc-header">
+        <h3>目录</h3>
+      </div>
+      <div class="toc-content">
+        <ul class="toc-list">
+          ${headings.map(heading => `
+            <li class="toc-item" style="margin-left: ${(heading.depth - 1) * 12}px">
+              <button class="toc-link" data-slug="${heading.slug}" title="${heading.text}">
+                ${heading.text}
+              </button>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+
+    // 添加到页面
+    document.body.appendChild(tocContainer);
+
+    // 添加点击事件
+    tocContainer.addEventListener('click', (e) => {
+      if (!e.target) return;
+
+      const target = e.target as HTMLElement;
+      const button = target.closest('.toc-link') as HTMLButtonElement;
+
+      if (button) {
+        const slug = button.getAttribute('data-slug');
+        if (slug) {
+          const element = document.getElementById(slug);
+          if (element) {
+            // 直接跳转到目标位置，无平滑效果
+            // 调整到页面上方：标题距离顶部150px
+            const targetPosition = element.offsetTop + 400;
+            window.scrollTo(0, targetPosition);
+          }
+        }
+      }
+    });
+
+    // 设置滚动高亮
+    let activeId = '';
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.boundingClientRect.top <= 100) {
+            activeId = entry.target.id;
+            // 更新高亮
+            tocContainer.querySelectorAll('.toc-link').forEach(link => {
+              link.classList.remove('active');
+              if (link.getAttribute('data-slug') === activeId) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      },
+      {
+        rootMargin: '-100px 0px -80% 0px',
+        threshold: 0
+      }
+    );
+
+    // 观察所有标题
+    headings.forEach(({ slug }) => {
+      const element = document.getElementById(slug);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    // 保存observer引用以便清理（使用类型断言）
+    (tocContainer as any)._observer = observer;
+
+    console.log('FloatingTOC created successfully');
+  };
+
+  // init
+  const setup = () => {
+    setupUrlAnchor();
+    setupLozad();
+    setupScrollBar();
+    setupFloatingTOC(); // 恢复TOC设置
+  };
+
+  document.addEventListener("DOMContentLoaded", setup);
+  if (window.swup?.hooks) {
+    setup();
+  } else {
+    document.addEventListener("swup:enable", () => {
+      window.swup.hooks.on("content:replace", setup);
+    });
+  }
+</script>

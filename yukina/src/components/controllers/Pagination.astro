@@ -1,0 +1,101 @@
+---
+export interface Props {
+  lastPage: number;
+  current: number;
+  prevURL?: string;
+  nextURL?: string;
+  style?: string;
+  class?: string;
+}
+
+const props = Astro.props;
+
+const maxVisiblePages = 4;
+let pages: (string | number)[] = [];
+
+if (props.lastPage <= maxVisiblePages) {
+  pages = Array.from({ length: props.lastPage }, (_, i) => i + 1);
+} else {
+  const startPage = Math.max(
+    1,
+    props.current - Math.floor(maxVisiblePages / 2),
+  );
+  const endPage = Math.min(props.lastPage, startPage + maxVisiblePages - 1);
+
+  if (startPage > 1) pages.push(1);
+  if (startPage > 2) pages.push("...");
+
+  pages.push(
+    ...Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i),
+  );
+
+  if (endPage < props.lastPage - 1) pages.push("...");
+  if (endPage < props.lastPage) pages.push(props.lastPage);
+}
+---
+
+<div
+  class="flex flex-row justify-center space-x-4"
+  style={props.style}
+  class:list={[props.class]}
+>
+  <a
+    href={props.prevURL}
+    class:list={[props.prevURL ? "button" : "button-disabled"]}
+  >
+    <span>＜</span>
+  </a>
+
+  <div class="flex flex-row space-x-2">
+    {
+      pages.map((page) =>
+        page === "..." ? (
+          <span class="text-md text-[var(--primary-color)]">...</span>
+        ) : (
+          <a
+            href={page === 1 ? "/" : `/${page}`}
+            class:list={[page === props.current ? "button-selected" : "button"]}
+          >
+            <span>{page}</span>
+          </a>
+        ),
+      )
+    }
+  </div>
+
+  <a
+    href={props.nextURL}
+    class:list={[props.nextURL ? "button" : "button-disabled"]}
+  >
+    <span>＞</span>
+  </a>
+</div>
+<style>
+  .button {
+    @apply flex h-10 w-10 flex-row items-center rounded-lg bg-[var(--card-color)] p-1 transition-all hover:brightness-90;
+    @apply dark:bg-[var(--card-color-lighten)] dark:hover:brightness-125;
+  }
+
+  .button span {
+    @apply w-full text-center text-[var(--primary-color)];
+  }
+
+  .button-disabled {
+    @apply flex h-10 w-10 cursor-not-allowed flex-row items-center rounded-lg bg-gray-200 p-1;
+    @apply dark:bg-[var(--card-color-lighten)] dark:brightness-50;
+  }
+
+  .button-disabled span {
+    @apply w-full text-center text-[var(--text-color)] opacity-50;
+  }
+
+  .button-selected {
+    @apply flex h-10 w-10 cursor-not-allowed flex-row items-center rounded-lg bg-[var(--primary-color)] p-1;
+    pointer-events: none;
+  }
+
+  .button-selected span {
+    @apply w-full text-center text-[var(--card-color)];
+    @apply dark:text-white/75;
+  }
+</style>

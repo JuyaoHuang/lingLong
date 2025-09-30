@@ -1,0 +1,35 @@
+.onload-animation {
+  opacity: 0;
+  animation: 300ms fade-in-up;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fade-in-up {
+  0% {
+    scale: 98%;
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+
+  100% {
+    scale: 100%;
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.onload-animation-fade-in {
+  opacity: 0;
+  animation: 300ms fade-in ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,19 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  name: string;
+  link: string;
+}
+const { name, link } = Astro.props;
+---
+
+<a href={link} target="_blank">
+  <div
+    class="flex h-10 w-10 flex-col justify-center rounded-lg transition-all hover:brightness-75 dark:hover:brightness-125"
+  >
+    <div class="flex flex-row justify-center">
+      <Icon name={name} size={24} class="text-[var(--primary-color)]" />
+    </div>
+  </div>
+</a>

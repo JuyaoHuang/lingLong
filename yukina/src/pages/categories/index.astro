@@ -1,0 +1,29 @@
+---
+import ChipLayout from "../../layouts/ChipLayout.astro";
+import I18nKeys from "../../locales/keys";
+import { i18n } from "../../locales/translation";
+import { getFirstCategories } from "../../utils/content";
+// 获取数据：调用函数，拿到所有分类的数据。
+// getFirstCategories() 返回的是一个 Map 对象，.values() 获取所有的值，
+// [...] 将其转为数组，最后 .sort() 进行排序。
+// 值：name，slug，posts[]
+const categories = [...(await getFirstCategories()).values()].sort();
+
+// 转换数据：将原始的 category 数据，转换成 ChipLayout 组件需要的格式。
+// 这是一个“数据映射”的过程，确保数据结构能匹配上组件的 Props 要求。
+const chips = categories.map((category) => {
+  return {
+    name: category.name,
+    // 芯片的链接地址，例如 "/categories/数学专题"
+    slug: category.slug,
+    subChip: category.posts.length.toString(),
+  };
+});
+
+---
+<!-- 展示标签链接 -->
+ <!-- 获取原始数据 (getFirstCategories) -> 转换为特定格式 (.map) -> 传递给UI组件 (<ChipLayout/>) -->
+ <!-- URL 地址： 当用户访问 https://你的域名.com/categories/ 时，看到的就是这个页面。
+功能： 它会获取您所有文章的一级分类，并将它们以一种“芯片”或“标签云”的形式整齐地展示出来。
+每个分类旁边还会显示该分类下的文章数量。用户点击其中任何一个分类，就会跳转到对应的一级分类详情页。 -->
+<ChipLayout chips={chips} title={i18n(I18nKeys.pages_categories_title)} />

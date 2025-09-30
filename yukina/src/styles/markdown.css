@@ -1,0 +1,142 @@
+.article code:not(pre code)::before {
+  content: none !important;
+}
+
+.article code:not(pre code)::after {
+  content: none !important;
+}
+
+.article code:not(pre code) {
+  @apply text-sm;
+  font-family: var(--code-font) !important;
+  border-radius: 4px;
+  color: var(--primary-color) !important;
+  background-color: var(--primary-color-lighten) !important;
+}
+
+.article h1,
+.article h2,
+.article h3,
+.article h4,
+.article h5,
+.article h6 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+.article h1::before,
+.article h2::before,
+.article h3::before,
+.article h4::before,
+.article h5::before,
+.article h6::before {
+  position: absolute;
+  display: block;
+  content: " ";
+  background-color: var(--primary-color);
+  top: 2.5px;
+  bottom: 3px;
+  width: 0.3rem;
+  border-radius: 4px;
+}
+
+.article h1 > a,
+.article h2 > a,
+.article h3 > a,
+.article h4 > a,
+.article h5 > a,
+.article h6 > a {
+  @apply m-2;
+}
+
+.article li::marker {
+  color: var(--primary-color) !important;
+}
+
+.article blockquote {
+  border-inline-start-color: var(--primary-color) !important;
+}
+
+.article blockquote {
+  @apply py-0.5 pl-3 pr-3 lg:pl-4;
+  font-style: normal !important;
+  border-radius: 0.25rem;
+  background-color: var(--primary-color-transparent) !important;
+}
+
+.article blockquote blockquote {
+  @apply my-1;
+}
+
+.article blockquote p {
+  padding: 0;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.article blockquote p:first-child {
+  padding-top: 0.3rem;
+}
+
+.article blockquote p:last-child {
+  padding-bottom: 0.3rem;
+}
+
+.article blockquote p::before {
+  content: "" !important;
+}
+
+.article blockquote p::after {
+  content: "" !important;
+}
+
+.article a {
+  color: var(--primary-color) !important;
+}
+
+.article hr {
+  @apply my-6;
+  border-color: var(--primary-color-lighten) !important;
+}
+
+.article pre {
+  @apply my-3;
+  overflow: hidden !important;
+}
+
+.article span.line {
+  font-size: 14px !important;
+  line-height: normal;
+  font-family: var(--code-font) !important;
+}
+
+.article code {
+  counter-reset: line;
+}
+
+.article span.line:before {
+  content: counter(line);
+  counter-increment: line;
+  direction: rtl;
+  display: inline-block;
+  margin-right: 1rem;
+  width: 1rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.article span.line:last-child:empty,
+.article span.line:last-child:has(> .article span:empty:only-child) {
+  display: none;
+}
+
+.article p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.article .astro-code {
+  border-radius: 0.75rem !important;
+  scrollbar-width: thin;
+}

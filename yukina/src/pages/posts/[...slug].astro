@@ -1,0 +1,88 @@
+---
+import { getCollection } from "astro:content";
+import { IdToSlug } from "../../utils/hash";
+import PostLayout from "../../layouts/PostLayout.astro";
+import { render } from "astro:content";
+
+
+// 所有单篇博客文章的最终渲染模板。
+// [...slug].astro: 这是一个动态路由。方括号 [] 表示 slug 是一个变量，而不是一个固定的名字。
+// 前面的三个点 ... 是一个“展开”操作符，意味着它可以匹配更深层次的路径，
+// 但在这个项目的上下文中，它的作用和 [slug].astro 几乎一样：
+// 为每一篇文章生成一个唯一的页面。slug 通常指代文章的URL友好型短名称。
+
+// 1.  `getStaticPaths` 扫描所有 `.md` 文件。
+// 2.  对于每一篇 `.md` 文件，它都用 `IdToSlug` 函数为其生成一个独特的 URL (`slug`)。
+// 3.  然后它告诉 Astro：“请使用本文件作为模板，为这个 URL 创建一个页面，
+//     并把这篇文章的全部数据 (`entry`) 传递给模板。”
+// 4.  模板接收到特定文章的 `entry` 数据，并使用 `render` 函数准备好文章正文（`<Content />`）。
+export async function getStaticPaths() {
+  const postEntries = await getCollection("posts");
+  return postEntries.map((entry) => ({
+    params: { slug: IdToSlug(entry.id) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+// 使用Astro内置功能获取标题数据，无需额外插件
+const { Content, headings } = await render(entry);
+---
+
+{
+  !entry.data.licenseName && (
+    <>
+      <PostLayout
+        title={entry.data.title}
+        subTitle={entry.data.description}
+        bannerImage={entry.data.cover}
+        published={entry.data.published}
+      >
+        <div
+          class="hidden"
+          data-pagefind-body
+          data-pagefind-weight="10"
+          data-pagefind-meta="title"
+        >
+          {entry.data.title}
+        </div>
+        <div data-pagefind-body>
+          <Content />
+        </div>
+      </PostLayout>
+    </>
+  )
+}
+{
+// 如果一篇文章是原创的（你没有在 frontmatter 里加 licenseName），它就用一个简洁的布局来展示。
+// 如果一篇文章是转载的（你在 frontmatter 里加了 licenseName 等信息），
+// 它就会在布局中自动包含作者、来源链接、许可协议等额外信息。
+// 无论哪种情况，文章的正文都通过 <Content /> 组件被精确地插入到布局的正确位置。
+// 同时，它还为 Pagefind 搜索工具准备了隐藏的元数据，以便用户可以搜索到这篇文章
+  entry.data.licenseName && (
+    <>
+      <PostLayout
+        title={entry.data.title}
+        subTitle={entry.data.description}
+        bannerImage={entry.data.cover}
+        published={entry.data.published}
+        license={{ name: entry.data.licenseName, url: entry.data.licenseUrl }}
+        author={entry.data.author}
+        sourceLink={entry.data.sourceLink}
+      >
+        <div
+          class="hidden"
+          data-pagefind-body
+          data-pagefind-weight="10"
+          data-pagefind-meta="title"
+        >
+          {entry.data.title}
+        </div>
+        <div data-pagefind-body>
+          <Content />
+        </div>
+      </PostLayout>
+    </>
+  )
+}
+<!-- <Fragment set:html={tocHTMLString} /> -->

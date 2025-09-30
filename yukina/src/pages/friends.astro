@@ -1,0 +1,40 @@
+---
+import I18nKeys from "../locales/keys";
+import { i18n } from "../locales/translation";
+import { GetArchives } from "../utils/content";
+import Main from "../layouts/MainLayout.astro";
+
+
+const friends = [
+  { name: 'Astro 官网', link: 'https://astro.build/', description: '像构建静态网站一样，构建更快的网站。' },
+  { name: 'Vue.js 官网', link: 'https://vuejs.org/', description: '渐进式 JavaScript 框架。' },
+  { name: 'FastAPI 官网', link: 'https://fastapi.tiangolo.com/', description: '高性能、易于学习、快速编码、可用于生产环境。' },
+];
+---
+
+
+<Main title="友情链接" >
+  <div class="prose max-w-3xl mx-auto p-8">
+    <h1>我的朋友们</h1>
+    
+    <ul class="list-none p-0">
+      {friends.map(friend => (
+        <li class="article0-wrapper">
+          <a href={friend.link} target="_blank" rel="noopener noreferrer" class="text-xl font-bold no-underline hover:underline">
+            {friend.name}
+          </a>
+          <p class="mt-1 text-gray-600">{friend.description}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Main>
+
+<style>
+  .article-wrapper {
+    @apply w-full rounded-2xl bg-[var(--card-color)] p-10;
+  }
+  .article {
+    @apply flex flex-col;
+  }
+</style>

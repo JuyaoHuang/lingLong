@@ -1,0 +1,17 @@
+---
+import ChipLayout from "../../layouts/ChipLayout.astro";
+import I18nKeys from "../../locales/keys";
+import { i18n } from "../../locales/translation";
+import { GetTags } from "../../utils/content";
+
+const tags = [...(await GetTags()).values()].sort();
+const chips = tags.map((tag) => {
+  return {
+    name: tag.name,
+    slug: tag.slug,
+    subChip: tag.posts.length.toString(),
+  };
+});
+---
+
+<ChipLayout chips={chips} title={i18n(I18nKeys.pages_tags_title)} />

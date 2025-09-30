@@ -1,0 +1,53 @@
+---
+// Component Imports
+import Main from "../layouts/MainLayout.astro";
+// 这是一个布局组件（Layout Component），但它不是一个基础布局，
+// 而是一个专用布局。它的核心作用是：以一种美观的、网格化的“卡片/标签”形式，展示一个链接列表。
+// ChipLayout.astro 是一个高度可复用的、数据驱动的UI组件。它的设计理念是：
+// 关注点分离: 它只负责“如何展示一堆链接”，而不关心这些链接是什么（是分类、是标签、还是其他东西）。具体数据由使用它的页面来提供。
+// 数据驱动: 你给它什么样的数据（chips 数组），它就渲染出什么样的界面。
+// 可组合性: 它通过嵌套在 MainLayout 中，复用了全站的通用结构。
+export interface Props {
+  chips: {
+    name: string;
+    slug?: string;
+    subChip?: string;
+  }[];
+  title?: string;
+  subTitle?: string;
+  bannerImage?: string;
+  slug?: string;
+}
+
+const { chips, title, subTitle, bannerImage, slug } = Astro.props;
+---
+
+<Main title={title} subTitle={subTitle} bannerImage={bannerImage} slug={slug}>
+  <div class="flex flex-col rounded-2xl bg-[var(--card-color)] p-6">
+    <div class="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
+      {
+        chips.map((chip) => (
+          <a
+            href={chip.slug}
+            class="chip flex select-none flex-row items-center justify-between rounded-lg px-4 py-2 transition-all hover:bg-[var(--primary-color-lighten)]"
+          >
+            <p class="chip-name truncate pl-0 text-lg text-[var(--text-color)] transition-all">
+              {chip.name}
+            </p>
+            {chip.subChip && (
+              <span class="ml-2 rounded-md bg-[var(--primary-color-lighten)] px-3 py-1 text-[var(--primary-color)]">
+                {chip.subChip}
+              </span>
+            )}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</Main>
+
+<style>
+  .chip:hover .chip-name {
+    @apply pl-2 text-[var(--primary-color)];
+  }
+</style>

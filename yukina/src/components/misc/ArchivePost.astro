@@ -1,0 +1,67 @@
+---
+import { formatDate } from "../../utils/date";
+import YukinaConfig from "../../../yukina.config";
+
+export interface Props {
+  id: string;
+  title: string;
+  pubilished: Date;
+  tags: string[] | undefined;
+}
+
+const { id, title, pubilished } = Astro.props;
+---
+
+<div class="item">
+  <a
+    href={id}
+    class="flex w-full select-none flex-row items-center rounded-md py-2 transition-colors hover:bg-[var(--primary-color-lighten)]"
+  >
+    <div class="flex w-[15%] flex-row justify-end md:w-[10%]">
+      <p class="date text-sm text-[var(--text-color-lighten)]">
+        {
+          formatDate(pubilished, YukinaConfig.locale, {
+            month: "2-digit",
+            day: "2-digit",
+          })
+        }
+      </p>
+    </div>
+    <div class="dash-line relative flex h-full w-[15%] items-center md:w-[10%]">
+      <div
+        class="item-dot z-50 mx-auto h-1 w-1 rounded bg-[var(--text-color-lighten)] outline outline-4 outline-[var(--card-color)] transition-all"
+      >
+      </div>
+    </div>
+    <div class="flex w-[70%] flex-row md:w-[80%]">
+      <p
+        class="title truncate font-semibold text-[var(--text-color)] transition-all"
+      >
+        {title}
+      </p>
+    </div>
+  </a>
+
+  <style>
+    .date {
+      font-family: var(--primary-font);
+    }
+
+    .title {
+      font-family: var(--primary-font);
+    }
+
+    .item:hover .title {
+      @apply pl-2 text-[var(--primary-color)];
+    }
+
+    .dash-line::before {
+      @apply absolute top-1/2 h-[40px] w-[10%] -translate-y-1/2 border-l-2 border-dashed border-l-[var(--text-color)] opacity-25 content-[''];
+      left: calc(50% - 1px);
+    }
+
+    .item:hover .item-dot {
+      @apply h-4 bg-[var(--primary-color)] outline-[var(--primary-color-lighten)];
+    }
+  </style>
+</div>
