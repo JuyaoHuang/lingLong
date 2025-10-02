@@ -311,12 +311,12 @@ export async function getSecondCategories() {
     }
 
     // 计算字数
-    const wordCount = countWords(post.body);
+    const wordCount = countWords(post.body || '');
 
     // 对象下的 posts 数组内部的值
     categories.get(categorySlug)!.posts.push({
       title: post.data.title,
-      id: post.id, // 【修复】传递原始文档ID，让PostCard组件自己处理URL生成
+      id: post.id, // 传递原始文档ID，让PostCard组件自己处理URL生成
       published: new Date(post.data.published),
       tags: post.data.tags,
       readingMetadata: {
@@ -324,13 +324,13 @@ export async function getSecondCategories() {
       },
       description:post.data.description,
       image:post.data.cover,
-      // 【新增】传递分类信息给PostCard组件显示
+      // 传递分类信息给PostCard组件显示
       first_level_category: post.data.first_level_category,
       second_level_category: post.data.second_level_category,
     });
   });
 
-  // 【新增】对每个分类下的文章按发布日期降序排序（最新的在前）
+  // 对每个分类下的文章按发布日期降序排序（最新的在前）
   categories.forEach((category) => {
     category.posts.sort((a, b) => {
       const dateA = new Date(a.published);
