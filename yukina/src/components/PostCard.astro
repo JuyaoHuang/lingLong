@@ -28,7 +28,7 @@ export interface Props {
 const props = Astro.props;
 const entryID = IdToSlug(props.id);
 const contentUrl = `/posts/${entryID}`;//根据文章ID生成了指向文章详情页的URL链接。
-const { time, wordCount } = props.readingMetadata ||{};//从阅读元数据中解构出时间和字数，方便在模板中使用
+const { wordCount } = props.readingMetadata || {};//从阅读元数据中解构出字数，方便在模板中使用
 
 ---
 <!-- 使用 Tailwind CSS 来构建卡片的视觉样式，并把上面逻辑部分处理好的数据显示出来 -->
@@ -149,14 +149,8 @@ const { time, wordCount } = props.readingMetadata ||{};//从阅读元数据中�
           <div class="reading-time">
             <span>
               <!-- 卡片下方的字数标识 -->
-              {wordCount ?? null}
+              {wordCount ?? 0}
               {i18n(I18nKeys.post_card_words)}
-            </span>
-            <span>|</span>
-            <span>
-              <!-- 卡片下方的时间标识 -->
-              {time ?? null}
-              {i18n(I18nKeys.post_card_minutes)}
             </span>
           </div>
         </div>

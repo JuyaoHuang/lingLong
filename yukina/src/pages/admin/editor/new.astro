@@ -1,0 +1,433 @@
+---
+/**
+ * New Post Editor Page
+ * Create new blog post with Monaco editor
+ */
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import Editor from '../../../components/admin/Editor.svelte';
+---
+
+<AdminLayout title="New Post">
+  <!-- Route Guard Script -->
+  <script is:inline>
+    function checkAuthentication() {
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        window.location.href = '/admin/login';
+      }
+    }
+    checkAuthentication();
+  </script>
+
+  <!-- New Post Editor -->
+  <div class="editor-page-container">
+    <div class="editor-header">
+      <h1 class="editor-title">Create New Post</h1>
+      <div class="editor-actions">
+        <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Post Form -->
+    <form id="post-form" class="post-form">
+      <!-- Metadata Fields -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title" class="form-label">Title *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            class="form-input"
+            required
+            placeholder="Enter post title..."
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="author" class="form-label">Author</label>
+          <input
+            type="text"
+            id="author"
+            name="author"
+            class="form-input"
+            placeholder="Author name..."
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="first_level_category" class="form-label">First Level Category *</label>
+          <input
+            type="text"
+            id="first_level_category"
+            name="first_level_category"
+            class="form-input"
+            required
+            placeholder="e.g., 技术分享"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="second_level_category" class="form-label">Second Level Category *</label>
+          <input
+            type="text"
+            id="second_level_category"
+            name="second_level_category"
+            class="form-input"
+            required
+            placeholder="e.g., 前端开发"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="tags" class="form-label">Tags</label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            class="form-input"
+            placeholder="tag1, tag2, tag3..."
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            class="form-textarea"
+            rows="3"
+            placeholder="Brief description of the post..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Draft Toggle -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="draft" name="draft" />
+          <span class="checkbox-text">Save as draft</span>
+        </label>
+      </div>
+
+      <!-- Content Editor -->
+      <div class="form-group editor-section">
+        <label class="form-label">Content *</label>
+        <Editor client:load height="500px" />
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" id="cancel-btn" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" id="save-btn" class="btn btn-primary">
+          <span id="save-text">Create Post</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-message" style="display: none;"></div>
+  </div>
+
+  <script>
+    import { postService } from '../../../services/postService';
+
+    let editorAPI: any = null;
+    let isSubmitting = false;
+
+    // Listen for editor ready event
+    document.addEventListener('editor-ready', (event: any) => {
+      console.log('Editor is ready!');
+      editorAPI = event.detail;
+    });
+
+    // Get editor instance when it's loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Form setup will be handled by event listeners below
+    });
+
+    function showError(message: string): void {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        errorDiv.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function hideError(): void {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) {
+        errorDiv.style.display = 'none';
+      }
+    }
+
+    function setSubmitting(submitting: boolean): void {
+      isSubmitting = submitting;
+      const saveBtn = document.getElementById('save-btn') as HTMLButtonElement | null;
+      const saveText = document.getElementById('save-text') as HTMLSpanElement | null;
+
+      if (saveBtn && saveText) {
+        saveBtn.disabled = submitting;
+        saveText.textContent = submitting ? 'Creating...' : 'Create Post';
+      }
+    }
+
+    function parseTags(tagsString: string | null): string[] {
+      if (!tagsString || !tagsString.trim()) return [];
+      return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    }
+
+    function validateForm(formData: any): string[] {
+      const errors: string[] = [];
+
+      if (!formData.title?.trim()) {
+        errors.push('Title is required');
+      }
+
+      if (!formData.first_level_category?.trim()) {
+        errors.push('First level category is required');
+      }
+
+      if (!formData.second_level_category?.trim()) {
+        errors.push('Second level category is required');
+      }
+
+      if (!formData.content?.trim()) {
+        errors.push('Content is required');
+      }
+
+      return errors;
+    }
+
+    // Form submission
+    const postForm = document.getElementById('post-form') as HTMLFormElement | null;
+    if (postForm) {
+      postForm.addEventListener('submit', async (e: Event) => {
+        e.preventDefault();
+
+        if (isSubmitting) return;
+
+        hideError();
+        setSubmitting(true);
+
+        try {
+          // Get form data
+          const formData = new FormData(postForm);
+          const content = editorAPI?.getValue ? editorAPI.getValue() : '';
+
+          const postData = {
+            title: formData.get('title') as string,
+            content: content,
+            first_level_category: formData.get('first_level_category') as string,
+            second_level_category: formData.get('second_level_category') as string,
+            author: formData.get('author') as string || undefined,
+            description: formData.get('description') as string || undefined,
+            tags: parseTags(formData.get('tags') as string),
+            draft: formData.has('draft'),
+            published: new Date().toISOString().split('T')[0] // Today's date
+          };
+
+          // Validate form
+          const errors = validateForm(postData);
+          if (errors.length > 0) {
+            showError(errors.join(', '));
+            return;
+          }
+
+          // Submit to API
+          const response = await postService.createPost(postData);
+
+          // Success - redirect to dashboard
+          window.location.href = '/admin/dashboard';
+
+        } catch (error: any) {
+          console.error('Error creating post:', error);
+          showError('Failed to create post: ' + (error.message || 'Unknown error'));
+        } finally {
+          setSubmitting(false);
+        }
+      });
+    }
+
+    // Cancel button
+    const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement | null;
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
+          window.location.href = '/admin/dashboard';
+        }
+      });
+    }
+  </script>
+</AdminLayout>
+
+<style>
+  .editor-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .editor-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .btn-primary:disabled {
+    background: #9ca3af;
+    border-color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: white;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+
+  .btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  .post-form {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .checkbox-text {
+    font-size: 0.875rem;
+    color: #374151;
+  }
+
+  .editor-section {
+    margin-bottom: 2rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .editor-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .post-form {
+      padding: 1rem;
+    }
+  }
+</style>

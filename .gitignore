@@ -158,6 +158,9 @@ yukina/.pnp.*
 yukina/src/pages/en
 yukina/src/pages/ja
 
+yukina/.pnpm-store/v3/
+yukina/src/contents/
+
 
 # ========================== backend =====================================
 backend/.devcontainer
@@ -167,3 +170,4 @@ backend/app/core/__pycache__/
 backend/app/data/__pycache__/
 backend/app/schemas/__pycache__/
 backend/app/services/__pycache__/
+

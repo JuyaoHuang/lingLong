@@ -10,12 +10,13 @@ import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkMath from "remark-math";
-import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
 import YukinaConfig from "./yukina.config";
 
 import pagefind from "astro-pagefind";
 
+
+import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 // https://astro.build/config
 export default defineConfig({
   site: YukinaConfig.site,
@@ -41,7 +42,7 @@ export default defineConfig({
     shikiConfig: {
       theme: "github-dark-default",
     },
-    remarkPlugins: [remarkReadingTime, remarkMath],
+    remarkPlugins: [remarkReadingTime,remarkMath],
     rehypePlugins: [
       rehypeSlug,
       rehypeKatex,
