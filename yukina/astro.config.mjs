@@ -14,9 +14,6 @@ import remarkMath from "remark-math";
 import YukinaConfig from "./yukina.config";
 
 import pagefind from "astro-pagefind";
-
-
-import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 // https://astro.build/config
 export default defineConfig({
   site: YukinaConfig.site,
@@ -42,7 +39,7 @@ export default defineConfig({
     shikiConfig: {
       theme: "github-dark-default",
     },
-    remarkPlugins: [remarkReadingTime,remarkMath],
+    remarkPlugins: [remarkMath],
     rehypePlugins: [
       rehypeSlug,
       rehypeKatex,

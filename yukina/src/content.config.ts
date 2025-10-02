@@ -24,7 +24,6 @@ const posts = defineCollection({
     licenseUrl: z.string().optional(),
     readingMetadata: z
       .object({
-        time: z.number(),
         wordCount: z.number(),
       })
       .optional(),

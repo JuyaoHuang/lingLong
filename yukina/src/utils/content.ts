@@ -1,6 +1,28 @@
 import { getCollection } from "astro:content";
 import { IdToSlug } from "./hash";
 
+// 字数统计函数，支持中文
+function countWords(text: string): number {
+  // 移除代码块、HTML标签等
+  const cleanText = text
+    .replace(/```[\s\S]*?```/g, '') // 移除代码块
+    .replace(/<[^>]*>/g, '') // 移除HTML标签
+    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
+    .replace(/\[.*?\]\(.*?\)/g, ''); // 移除链接
+
+  // 统计中文字符（包括中文标点）
+  const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+
+  // 统计英文单词（通过空格分割）
+  const englishWords = cleanText
+    .replace(/[\u4e00-\u9fa5]/g, ' ') // 将中文字符替换为空格
+    .split(/\s+/)
+    .filter(word => word.length > 0).length;
+
+  // 返回中文字符数 + 英文单词数
+  return chineseChars + englishWords;
+}
+
 // ================== 二级分类系统改进总结 ==================
 //
 // 本文件实现了从单级分类到二级分类系统的重要改进：
@@ -58,7 +80,7 @@ export interface postCard{
   tags?: string[];
   description?: string;
   image?: string;
-  readingMetadata?: { time: number; wordCount: number };
+  readingMetadata?: { wordCount: number };
 }
 
 /**
@@ -110,6 +132,14 @@ export async function GetSortedPosts() {
     const dateB = new Date(b.data.published);
     return dateA > dateB ? -1 : 1;
   });
+
+  // 计算字数并注入到 data 中
+  for (const post of sorted) {
+    const wordCount = countWords(post.body);
+    (post.data as any).readingMetadata = {
+      wordCount: wordCount,
+    };
+  }
 
   for (let i = 1; i < sorted.length; i++) {
     (sorted[i].data as any).nextSlug = (sorted[i - 1] as any).slug;
@@ -279,13 +309,19 @@ export async function getSecondCategories() {
         posts: [],
       });
     }
+
+    // 计算字数
+    const wordCount = countWords(post.body);
+
     // 对象下的 posts 数组内部的值
     categories.get(categorySlug)!.posts.push({
       title: post.data.title,
       id: post.id, // 【修复】传递原始文档ID，让PostCard组件自己处理URL生成
       published: new Date(post.data.published),
       tags: post.data.tags,
-      readingMetadata:post.data.readingMetadata,
+      readingMetadata: {
+        wordCount: wordCount,
+      },
       description:post.data.description,
       image:post.data.cover,
       // 【新增】传递分类信息给PostCard组件显示
