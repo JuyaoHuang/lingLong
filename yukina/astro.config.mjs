@@ -14,6 +14,8 @@ import remarkMath from "remark-math";
 import YukinaConfig from "./yukina.config";
 
 import pagefind from "astro-pagefind";
+import removeConsole from "vite-plugin-remove-console";
+
 // https://astro.build/config
 export default defineConfig({
   site: YukinaConfig.site,
@@ -35,6 +37,14 @@ export default defineConfig({
     sitemap(),
     pagefind(),
   ],
+  vite: {
+    plugins: [
+      // 只在生产构建时移除 console
+      removeConsole({
+        external: ['error', 'warn'], // 保留 console.error 和 console.warn
+      }),
+    ],
+  },
   markdown: {
     shikiConfig: {
       theme: "github-dark-default",

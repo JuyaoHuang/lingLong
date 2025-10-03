@@ -44,10 +44,10 @@
     "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "reading-time": "^1.5.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-katex": "^7.0.1",
     "rehype-slug": "^6.0.0",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "vite-plugin-remove-console": "^2.2.0"
   }
 }

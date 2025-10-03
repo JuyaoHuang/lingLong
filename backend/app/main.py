@@ -5,7 +5,8 @@ FastAPI博客后端应用程序 - FastAPI Blog Backend Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .core.config import settings
+
+from .core.config import settings, ALLOWED_ORIGINS
 from .data.database import create_tables
 from .api import auth, posts
 
@@ -21,7 +22,7 @@ app = FastAPI(
 # 配置CORS中间件 - Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
