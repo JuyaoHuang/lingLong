@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     # environment config
     ENVIRONMENT: str = "production"  # development | production
 
+    # Admin User Configuration
+    # 管理员密码配置 - 从环境变量读取
+    # Admin password configuration - read from environment variable
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_PASSWORD: Optional[str] = None  # 必须在 .env 中设置 PASSWORD
+
     # CORS 配置 - 允许跨域来源
     # 开发环境：可设置为空使用默认的本地端口
     # 生产环境：必须在 .env 中明确指定域名，如：ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
@@ -54,7 +60,7 @@ class Settings(BaseSettings):
     LOCAL_PORT_RANGE_END: int = 5000
 
     class Config:
-        env_file = ".env"
+        env_file = "../.env"  # 使用项目根目录的 .env
         case_sensitive = True
 
 settings = Settings()

@@ -1,68 +1,37 @@
 ---
 /**
- * Edit Post Page
- * Edit existing blog post with Monaco editor
- * * 编辑帖子页面
-  *  使用 Monaco 编辑器编辑现有博客文章
+ * New Post Editor Page
+ * Create new blog post with Monaco editor
+ * * 新建文章编辑器页面
+  * 使用 Monaco 编辑器创建新文章
  */
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import Editor from '../../../components/admin/Editor.svelte';
-import { getCollection } from 'astro:content';
-
-// Server-side: getStaticPaths for dynamic routing
-// 服务器端：getStaticPaths 用于动态路由
-export async function getStaticPaths() {
-  try {
-    //获取所有帖子以生成静态路由以供编辑
-    // Get all posts to generate static routes for editing
-    const posts = await getCollection('posts');
-
-    return posts.map((post) => {
-      return {
-        params: { slug: post.id },  // Use post.id as the slug
-        props: { post },
-      };
-    });
-  } catch (error) {
-    console.error('Error in getStaticPaths:', error);
-    return [];
-  }
-}
-//服务器端：从 Astro.params 获取 slug
-// Server-side: Get slug from Astro.params
-const { slug } = Astro.params;
-const { post } = Astro.props;
 ---
 
-<AdminLayout title="Edit Post">
+<AdminLayout title="New Post">
   <!-- Route Guard Script -->
   <script is:inline>
     function checkAuthentication() {
       const token = localStorage.getItem('admin_token');
       if (!token) {
-        window.location.href = '/admin/login';
+        window.location.href = '/atri/login';
       }
     }
     checkAuthentication();
   </script>
 
-  <!-- Edit Post Editor -->
+  <!-- New Post Editor -->
   <div class="editor-page-container">
     <div class="editor-header">
-      <h1 class="editor-title">Edit Post</h1>
+      <h1 class="editor-title">Create New Post</h1>
       <div class="editor-actions">
-        <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        <a href="/atri/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div id="loading-container" class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Loading post...</p>
-    </div>
-
     <!-- Post Form -->
-    <form id="post-form" class="post-form" style="display: none;">
+    <form id="post-form" class="post-form">
       <!-- Metadata Fields -->
       <div class="form-grid">
         <div class="form-group">
@@ -96,7 +65,7 @@ const { post } = Astro.props;
             name="first_level_category"
             class="form-input"
             required
-            placeholder="e.g., Tech Sharing"
+            placeholder="e.g., 技术分享"
           />
         </div>
 
@@ -108,7 +77,7 @@ const { post } = Astro.props;
             name="second_level_category"
             class="form-input"
             required
-            placeholder="e.g., Frontend Development"
+            placeholder="e.g., 前端开发"
           />
         </div>
 
@@ -155,7 +124,7 @@ const { post } = Astro.props;
           Cancel
         </button>
         <button type="submit" id="save-btn" class="btn btn-primary">
-          <span id="save-text">Update Post</span>
+          <span id="save-text">Create Post</span>
         </button>
       </div>
     </form>
@@ -167,96 +136,19 @@ const { post } = Astro.props;
   <script>
     import { postService } from '../../../services/postService';
 
-    // 客户端变量--Client-side variables
     let editorAPI: any = null;
     let isSubmitting = false;
-    let currentPost: any = null;
 
-    // 从 URL 获取 slug（客户端方法）--Get slug from URL (client-side approach)
-    // 过滤掉空字符串来处理尾部斜杠--Filter out empty strings to handle trailing slashes
-    const pathSegments = window.location.pathname.split('/').filter(s => s.length > 0);
-    const slug = pathSegments[pathSegments.length - 1];
-
-    // 监听编辑器就绪事件--Listen for editor ready event
+    // 监听编辑器就绪事件
     document.addEventListener('editor-ready', (event: any) => {
       console.log('Editor is ready!');
       editorAPI = event.detail;
-
-      // Set editor content if we have current post data
-      if (currentPost && currentPost.content) {
-        editorAPI.setValue(currentPost.content);
-      }
     });
 
-    // Load post data
+    // 加载时获取编辑器实例
     document.addEventListener('DOMContentLoaded', () => {
-      loadPost();
+      // 表单设置将由下面的事件监听器处理
     });
-
-    async function loadPost(): Promise<void> {
-      try {
-        showLoading(true);
-        hideError();
-
-        // Fetch post data  获取帖子数据
-        currentPost = await postService.getPostBySlug(slug);
-
-        // 填充表单字段--Populate form fields
-        populateForm(currentPost);
-
-        // 显示表单，隐藏加载--Show form, hide loading
-        showLoading(false);
-        showForm(true);
-
-        // 如果编辑器准备就绪，则设置编辑器内容--Set editor content if editor is ready
-        if (editorAPI && editorAPI.setValue) {
-          editorAPI.setValue(currentPost.content || '');
-        }
-
-      } catch (error: any) {
-        console.error('Error loading post:', error);
-        showError('Failed to load post: ' + (error.message || 'Post not found'));
-        showLoading(false);
-      }
-    }
-
-    function populateForm(post: any): void {
-      const fields = {
-        'title': post.title || '',
-        'author': post.author || '',
-        'first_level_category': post.first_level_category || '',
-        'second_level_category': post.second_level_category || '',
-        'tags': post.tags ? post.tags.join(', ') : '',
-        'description': post.description || ''
-      };
-
-      Object.entries(fields).forEach(([fieldName, value]) => {
-        const field = document.getElementById(fieldName) as HTMLInputElement | HTMLTextAreaElement | null;
-        if (field) {
-          field.value = value;
-        }
-      });
-
-      // Set draft checkbox
-      const draftCheckbox = document.getElementById('draft') as HTMLInputElement | null;
-      if (draftCheckbox) {
-        draftCheckbox.checked = post.draft || false;
-      }
-    }
-
-    function showLoading(show: boolean): void {
-      const loadingContainer = document.getElementById('loading-container');
-      if (loadingContainer) {
-        loadingContainer.style.display = show ? 'flex' : 'none';
-      }
-    }
-
-    function showForm(show: boolean): void {
-      const postForm = document.getElementById('post-form');
-      if (postForm) {
-        postForm.style.display = show ? 'block' : 'none';
-      }
-    }
 
     function showError(message: string): void {
       const errorDiv = document.getElementById('error-message');
@@ -281,7 +173,7 @@ const { post } = Astro.props;
 
       if (saveBtn && saveText) {
         saveBtn.disabled = submitting;
-        saveText.textContent = submitting ? 'Updating...' : 'Update Post';
+        saveText.textContent = submitting ? 'Creating...' : 'Create Post';
       }
     }
 
@@ -312,66 +204,65 @@ const { post } = Astro.props;
       return errors;
     }
 
-    // Form submission
-    setTimeout(() => {
-      const postForm = document.getElementById('post-form') as HTMLFormElement | null;
-      if (postForm) {
-        postForm.addEventListener('submit', async (e: Event) => {
-          e.preventDefault();
+    // 表单提交
+    const postForm = document.getElementById('post-form') as HTMLFormElement | null;
+    if (postForm) {
+      postForm.addEventListener('submit', async (e: Event) => {
+        e.preventDefault();
 
-          if (isSubmitting) return;
+        if (isSubmitting) return;
 
-          hideError();
-          setSubmitting(true);
+        hideError();
+        setSubmitting(true);
 
-          try {
-            // Get form data
-            const formData = new FormData(postForm);
-            const content = editorAPI?.getValue ? editorAPI.getValue() : '';
+        try {
+          // Get form data
+          const formData = new FormData(postForm);
+          const content = editorAPI?.getValue ? editorAPI.getValue() : '';
 
-            const postData = {
-              title: formData.get('title') as string,
-              content: content,
-              first_level_category: formData.get('first_level_category') as string,
-              second_level_category: formData.get('second_level_category') as string,
-              author: formData.get('author') as string || undefined,
-              description: formData.get('description') as string || undefined,
-              tags: parseTags(formData.get('tags') as string),
-              draft: formData.has('draft')
-            };
+          const postData = {
+            title: formData.get('title') as string,
+            content: content,
+            first_level_category: formData.get('first_level_category') as string,
+            second_level_category: formData.get('second_level_category') as string,
+            author: formData.get('author') as string || undefined,
+            description: formData.get('description') as string || undefined,
+            tags: parseTags(formData.get('tags') as string),
+            draft: formData.has('draft'),
+            published: new Date().toISOString().split('T')[0] // Today's date
+          };
 
-            // Validate form
-            const errors = validateForm(postData);
-            if (errors.length > 0) {
-              showError(errors.join(', '));
-              return;
-            }
-
-            // Submit to API
-            const response = await postService.updatePost(slug, postData);
-
-            // Success - redirect to dashboard
-            window.location.href = '/admin/dashboard';
-
-          } catch (error: any) {
-            console.error('Error updating post:', error);
-            showError('Failed to update post: ' + (error.message || 'Unknown error'));
-          } finally {
-            setSubmitting(false);
+          // Validate form
+          const errors = validateForm(postData);
+          if (errors.length > 0) {
+            showError(errors.join(', '));
+            return;
           }
-        });
-      }
 
-      // Cancel button
-      const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement | null;
-      if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-          if (confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
-            window.location.href = '/admin/dashboard';
-          }
-        });
-      }
-    }, 100);
+          // Submit to API
+          const response = await postService.createPost(postData);
+
+          // Success - redirect to dashboard
+          window.location.href = '/atri/dashboard';
+
+        } catch (error: any) {
+          console.error('Error creating post:', error);
+          showError('Failed to create post: ' + (error.message || 'Unknown error'));
+        } finally {
+          setSubmitting(false);
+        }
+      });
+    }
+
+    // Cancel button
+    const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement | null;
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
+          window.location.href = '/atri/dashboard';
+        }
+      });
+    }
   </script>
 </AdminLayout>
 
@@ -436,30 +327,6 @@ const { post } = Astro.props;
   .btn-secondary:hover {
     background: #f9fafb;
     border-color: #9ca3af;
-  }
-
-  .loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem;
-    color: #6b7280;
-  }
-
-  .loading-spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 2px solid #e5e7eb;
-    border-top: 2px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
   }
 
   .post-form {

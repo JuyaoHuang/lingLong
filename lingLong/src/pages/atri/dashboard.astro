@@ -15,7 +15,7 @@ import PostTable from '../../components/admin/PostTable.svelte';
     function checkAuthentication() {
       const token = localStorage.getItem('admin_token');
       if (!token) {
-        window.location.href = '/admin/login';
+        window.location.href = '/atri/login';
       }
     }
     checkAuthentication();
@@ -26,7 +26,7 @@ import PostTable from '../../components/admin/PostTable.svelte';
     <div class="dashboard-header">
       <h1 class="dashboard-title">Posts Management</h1>
       <div class="dashboard-actions">
-        <a href="/admin/editor/new" class="btn btn-primary">+ New Post</a>
+        <a href="/atri/editor/new" class="btn btn-primary">+ New Post</a>
       </div>
     </div>
 
