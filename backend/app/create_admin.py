@@ -15,7 +15,6 @@ def create_admin_user():
     """Create initial admin user"""
     create_tables()
 
-    # Create database session
     db = SessionLocal()
 
     try:

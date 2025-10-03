@@ -18,7 +18,7 @@ class PostMetadata(BaseModel):
     """
     slug: str
     title: str
-    published: date  # 保持date格式，与前端AdminPostCard.astro Props一致
+    published: date 
     description: Optional[str] = None
     tags: Optional[List[str]] = None
     first_level_category: str
@@ -40,7 +40,7 @@ class PostCreate(BaseModel):
     """
     title: str
     content: str
-    published: date  # 保持date格式
+    published: date 
     description: Optional[str] = None
     tags: Optional[List[str]] = None
     first_level_category: str
@@ -62,7 +62,7 @@ class PostUpdate(BaseModel):
     """
     title: Optional[str] = None
     content: Optional[str] = None
-    published: Optional[date] = None  # 保持date格式
+    published: Optional[date] = None 
     description: Optional[str] = None
     tags: Optional[List[str]] = None
     first_level_category: Optional[str] = None
