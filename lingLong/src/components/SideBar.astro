@@ -1,0 +1,221 @@
+---
+import { Icon } from "astro-icon/components";
+import LingLongConfig from "../../linglong.config";
+import I18nKeys from "../locales/keys";
+import { i18n } from "../locales/translation";
+import { getFirstCategories, GetTags } from "../utils/content";
+import SocialIcon from "./widgets/SocialIcon.astro";
+// 一个动态、可配置的博客侧边栏
+// 这段代码定义了一个博客网站的侧边栏（Sidebar）组件。 这个侧边栏不是写死的静态内容，
+// 而是动态地、智能地展示了三块核心信息：
+// 博主信息卡片 (Profile Card)： 显示博主的头像、用户名、签名以及社交媒体链接。
+// 文章分类卡片 (Categories Card)： 自动抓取并展示网站所有的文章分类，以及每个分类下的文章数量。
+// 文章标签卡片 (Tags Card)： 自动抓取并展示网站所有的文章标签。
+
+// 总结:
+// 自动化内容聚合： 无需手动维护侧边栏的分类和标签列表，它会根据你的文章内容自动生成。
+// 配置驱动： 网站的基本信息（用户名、头像、链接等）都抽离在 linglong.config.js 文件中，修改个人信息无需改动组件代码。
+// 组件化： 它本身是一个大组件，同时内部又使用了 <Icon>、<SocialIcon> 等更小的组件，代码结构清晰，易于维护。
+// 动态渲染： 通过 {} 语法和 .map 循环，将动态数据渲染成 HTML。通过 && 实现条件渲染，让界面更智能（没有标签就不显示标签卡片）。
+// 国际化支持： 所有固定的文本都通过 i18n 函数处理，为多语言网站打下了基础。
+const tags = await GetTags();
+const categories = await getFirstCategories();
+
+const categoryKeys = [...categories.keys()];
+const tagKeys = [...tags.keys()];
+---
+
+<div class="flex w-full flex-row justify-center">
+  <div class="flex flex-col space-y-3">
+    <div
+      class="onload-animation rounded-3xl bg-[var(--card-color)] p-3"
+      style=`animation-delay: var(--onload-animation-delay);`
+    >
+      <a href="/about" class="avatar-wrapper">
+        <img
+          src={LingLongConfig.avatarUrl}
+          alt="avatar"
+          class="avatar lozad select-none"
+        />
+        <!-- 从配置文件中读取头像地址并显示图片 -->
+      </a>
+      <div class="username mt-4">
+        <p>{LingLongConfig.username}</p>
+      </div>
+      <p class="slogan mt-2 text-center text-[var(--text-color-lighten)]">
+        {LingLongConfig.sign}
+      </p>
+      <!-- 遍历配置文件中的 socialLinks 数组
+      （例如，[{ icon: 'github', link: '...' }, { icon: 'twitter', link: '...' }])。 -->
+      {
+        LingLongConfig.socialLinks.length > 0 && (
+          <div class="mt-1 flex flex-row justify-center">
+            <div class="flex w-[184px] flex-wrap justify-center gap-2">
+              {LingLongConfig.socialLinks.map((item) => (
+                <SocialIcon name={item.icon} link={item.link} />
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- categories -->
+    {
+      // 条件判断，只有当网站存在至少一个分类时，才显示这个卡片
+      categories.size !== 0 && (
+        <div
+          class="onload-animation space-y-2 rounded-3xl bg-[var(--card-color)] p-3"
+          style="animation-delay: calc(var(--onload-animation-delay) + 1 * var(--onload-animation-interval));"
+        >
+          <div class="title m-[0.375rem]">
+            <a
+              href="/categories/"
+              class="pl-4 text-xl font-bold text-[var(--text-color)] transition-colors hover:text-[var(--primary-color)]"
+            >
+              {i18n(I18nKeys.side_bar_categories)}
+            </a>
+          </div>
+          <div class="relative flex flex-col">
+            {categoryKeys
+              // 首先从配置文件里读取一个叫做 maxSidebarCategoryChip 的数字，
+              // 这个数字决定了侧边栏最多显示多少个分类
+              // .slice(...) 方法截取了分类列表的一部分进行展示。
+              // .map(...) 遍历这些要展示的分类，为每一个分类创建一个带链接的列表项。
+              // 链接指向 /categories/分类名，并同时显示分类名和该分类下的文章数量 posts.length
+              .slice(0, LingLongConfig.maxSidebarCategoryChip + 1)
+              .map((category) => (
+                <a
+                  href={`/categories/${category}`}
+                  class="category flex flex-row items-center justify-between rounded-lg px-3 py-2 transition-all hover:bg-[var(--primary-color-lighten)]"
+                >
+                  <p class="text-[var(--text-color)] transition-all">
+                    {categories.get(category)!.name}
+                  </p>
+                  <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
+                    {categories.get(category)!.posts.length}
+                  </span>
+                </a>
+              ))}
+              {/* 这是一个“查看更多”的逻辑,如果文章分类的总数超过了侧边栏设定的最大显示数量，
+              这里就会渲染一个“查看更多”的链接，引导用户到完整的分类页面。 */}
+            {categoryKeys.length >= LingLongConfig.maxSidebarCategoryChip + 1 && (
+              <div class="absolute bottom-0 flex h-11 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
+                <a
+                  href="/categories/"
+                  class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
+                >
+                  <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+                  <Icon name="mingcute:arrow-right-line" />
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    <!-- tags -->
+    <!-- 逻辑和“文章分类卡片”几乎完全一样，只是处理的数据从 categories 换成了 tags，用来展示标签云 -->
+    {
+      tags.size !== 0 && (
+        <div
+          class="onload-animation space-y-2 rounded-3xl bg-[var(--card-color)] p-3"
+          style="animation-delay: calc(var(--onload-animation-delay) + 2 * var(--onload-animation-interval));"
+        >
+          <div class="title m-[0.375rem]">
+            <a
+              href="/tags/"
+              class="pl-4 text-xl font-bold text-[var(--text-color)] transition-colors hover:text-[var(--primary-color)]"
+            >
+              {i18n(I18nKeys.side_bar_tags)}
+            </a>
+          </div>
+          <div class="relative flex max-w-[224px] flex-row flex-wrap">
+            {tagKeys.slice(0, LingLongConfig.maxSidebarTagChip + 1).map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="tag m-1 grow rounded-md bg-[var(--primary-color-lighten)] px-2 py-1 transition-all hover:brightness-95"
+              >
+                <p class="text-center text-sm text-[var(--primary-color)]">
+                  {tags.get(tag)!.name}
+                </p>
+              </a>
+            ))}
+            {tagKeys.length >= LingLongConfig.maxSidebarTagChip + 1 && (
+              <div class="absolute bottom-0 flex h-10 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
+                <a
+                  href="/tags/"
+                  class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
+                >
+                  <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+                  <Icon name="mingcute:arrow-right-line" />
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+  </div>
+</div>
+<style>
+  .avatar-wrapper::after {
+    @apply absolute left-3 top-3 h-56 w-56 rounded-xl transition-all content-[''];
+  }
+
+  .avatar-wrapper::after:hover {
+    @apply bg-black/25 dark:bg-black/50;
+  }
+
+  .avatar {
+    @apply h-56 w-56 rounded-xl transition-all hover:cursor-pointer;
+  }
+
+  .username > p {
+    @apply text-center text-xl font-semibold text-[var(--text-color)];
+    font-family: var(--title-font);
+  }
+
+  .username > div {
+    @apply mx-auto mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)];
+  }
+
+  .slogan {
+    font-family: var(--title-font);
+  }
+
+  .title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+  }
+
+  .title::before {
+    position: absolute;
+    display: block;
+    content: " ";
+    background-color: var(--primary-color);
+    top: 3px;
+    bottom: 3px;
+    width: 0.3rem;
+    border-radius: 4px;
+  }
+
+  .title p {
+    font-family: var(--primary-font);
+  }
+
+  .category {
+    font-family: var(--primary-font);
+  }
+
+  .category:hover > p {
+    @apply pl-2 text-[var(--primary-color)];
+  }
+
+  .tag {
+    font-family: var(--primary-font);
+  }
+</style>

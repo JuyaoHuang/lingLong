@@ -1,0 +1,368 @@
+---
+import LingLongConfig from "../../linglong.config";
+// linglong.config.js 文件里定义了网站的标题和导航链接数组
+// 这样做的好处是，当你想修改网站标题或增删导航链接时，只需要修改配置文件，而不用动组件代码。
+import { i18n } from "../locales/translation";
+// 导入国际化（i18n）函数。导航链接的文本
+// 如 "Home", "Posts" 不是写死的，而是通过 i18n(nav.nameKey) 来获取。这样可以方便地为网站添加多语言支持
+import { Icon } from "astro-icon/components";
+import SearchBar from "./SearchBar.svelte";
+//导入两个用 Svelte 框架编写的搜索框组件
+import MobileSearchBar from "./MobileSearchBar.svelte";
+import "astro-pagefind";
+
+// 核心作用是构建和管理整个网站的顶部导航栏
+// 它不仅仅是一个静态的链接列表，而是一个功能完备、响应式的导航中心，
+// 集成了配置、多语言、搜索、主题切换和复杂的交互逻辑。
+
+const navCount = LingLongConfig.navigators.length;
+---
+
+<nav class="nav" id="nav">
+  <div
+    class="relative flex h-[4rem] w-full items-center justify-between overflow-visible lg:h-[4.5rem]"
+  >
+    <div class="brand after:content-['']">
+      <button
+        id="menu-switcher"
+        type="button"
+        class="h-[40px] w-[44px] content-center"
+      >
+        <Icon
+          id="menu-icon-closed"
+          size={24}
+          name="line-md:close-to-menu-transition"
+          class="mx-auto hidden"
+        />
+        <Icon
+          id="menu-icon-opened"
+          size={24}
+          name="line-md:menu-to-close-transition"
+          class="mx-auto hidden"
+        />
+      </button>
+      <a class="title" href="/">
+        {LingLongConfig.brandTitle}
+      </a>
+      <!-- 如果点击按钮，那么就会跳转到主页 href="/"-->
+    </div>
+    <a class="brand-lg" href="/">
+      <div class="title space-x-2">
+        <Icon name="heroicons:home" size={32} />
+        <p>{LingLongConfig.brandTitle}</p>
+      </div>
+    </a>
+    <!-- 使用 LingLongConfig.navigators 的内容动态渲染导航菜单 -->
+    <div class="menu">
+      {
+        LingLongConfig.navigators.map((nav) => (
+          <a href={nav.href}>
+            <p>{i18n(nav.nameKey)}</p>
+          </a>
+        ))
+      }
+    </div>
+    <div class="toolbar">
+      <div class="lg:hidden">
+        <MobileSearchBar client:only="svelte" />
+      </div>
+      <div class="hidden lg:block">
+        <SearchBar client:only="svelte" />
+        <!-- client:only="svelte" 是 Astro 的一个关键指令，它告诉 Astro：这个组件是交互式的，
+         不要在服务器上渲染它，把它连同 Svelte 的运行时代码一起发送到浏览器端执行。 -->
+      </div>
+      <div class="theme">
+        <button type="button" id="theme-switcher">
+          <Icon
+            id="theme-icon-light"
+            name="line-md:moon-alt-to-sunny-outline-loop-transition"
+            size={24}
+            class="hidden"
+          />
+          <Icon
+            id="theme-icon-dark"
+            name="line-md:sunny-outline-to-moon-alt-loop-transition"
+            size={24}
+            class="hidden"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="mobile-menu" class="px-3 transition-all">
+    <ul
+      id="mobile-menu-nav"
+      class="mobile-menu-nav mobile-menu-nav-closed flex flex-col space-y-6 overflow-hidden text-xl font-medium text-[var(--text-color)] transition-all duration-300"
+    >
+      {
+        LingLongConfig.navigators.map((nav) => (
+          <li class="mt-1">
+            <a href={nav.href} class="mobile-nav-item">
+              <div class="flex flex-row items-center space-x-2">
+                <span class="text-[var(--primary-color)]">·</span>
+                <span>{i18n(nav.nameKey)}</span>
+              </div>
+              <Icon
+                name="cuida:caret-right-outline"
+                class="text-[var(--text-color-lighten)]"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
+
+<style define:vars={{ navCount }}>
+  .nav {
+    @apply fixed left-1/2 z-10 flex w-full select-none flex-col justify-end rounded-b-xl bg-[var(--card-color-transparent)] px-2.5 opacity-0 backdrop-blur-md transition-all;
+    @apply lg:w-[var(--page-width-lg)] lg:rounded-b-2xl;
+    @apply xl:w-[var(--page-width-xl)];
+    transform: translateX(-50%) translateY(-5rem);
+    animation: 300ms nav-onload-animation;
+    animation-fill-mode: forwards;
+  }
+
+  .brand {
+    @apply flex w-full flex-row items-center justify-between;
+    @apply lg:hidden;
+  }
+
+  .brand > .title {
+    @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 truncate rounded-lg px-4 py-2 text-2xl font-medium text-[var(--primary-color)] transition-all;
+    @apply hover:bg-[var(--primary-color-hover)];
+    font-family: var(--brand-font);
+  }
+
+  .brand button {
+    @apply mr-2 flex h-[44px] w-[44px] flex-row items-center rounded-lg text-[var(--text-color)] transition-all;
+    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
+  }
+
+  .brand .icon {
+    @apply w-full text-center text-2xl;
+  }
+
+  .brand-lg {
+    @apply hidden h-[3.25rem] rounded-lg px-5 font-medium transition-all;
+    @apply lg:block;
+    @apply hover:bg-[var(--primary-color-hover)];
+    @apply active:scale-95;
+  }
+
+  .brand-lg > .title {
+    @apply flex h-full flex-row content-center items-center text-2xl text-[var(--primary-color)];
+    font-family: var(--brand-font);
+  }
+
+  .brand-lg .icon {
+    @apply mr-2 stroke-2 text-2xl;
+  }
+
+  .menu {
+    @apply absolute left-1/2 hidden -translate-x-1/2 items-center justify-between space-x-1 text-lg text-[var(--text-color)] opacity-85;
+    @apply lg:flex;
+  }
+
+  .menu a {
+    @apply flex h-[3.25rem] items-center rounded-lg px-6 transition-all;
+    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
+    @apply active:scale-95;
+  }
+
+  .menu p {
+    @apply font-medium leading-normal;
+    font-family: var(--primary-font);
+  }
+
+  .toolbar {
+    @apply flex flex-row items-center justify-end space-x-1 lg:mr-2;
+  }
+
+  .toolbar button {
+    @apply flex w-11 justify-center rounded-lg py-2 text-[var(--text-color)] transition-all;
+    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
+  }
+
+  .toolbar .icon {
+    @apply stroke-2 text-xl;
+  }
+
+  .mobile-menu-nav-closed {
+    @apply h-0 opacity-0;
+  }
+
+  .mobile-menu-nav-opened {
+    @apply opacity-100;
+    height: calc(var(--navCount) * 52px);
+  }
+
+  .mobile-menu-nav li a {
+    @apply flex flex-row items-center justify-between;
+    font-family: var(--primary-font);
+  }
+
+  @keyframes nav-onload-animation {
+    0% {
+      transform: translateY(-5rem) translateX(-50%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) translateX(-50%);
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Reinitializes an SVG icon by cloning it and replacing the original icon with the clone.
+   *
+   * @param icon - The SVG element to be reinitialized.
+   * @returns The cloned SVG element that replaced the original.
+   */
+  const reinitializeIcon = (icon: SVGElement) => {
+    const cloned = icon.cloneNode(true) as SVGElement;
+    icon.parentNode?.replaceChild(cloned, icon);
+    return cloned;
+  };
+
+  // get elements
+  const menuSwitcher = document.getElementById(
+    "menu-switcher",
+  ) as HTMLButtonElement;
+  const mobileMenuNav = document.getElementById(
+    "mobile-menu-nav",
+  ) as HTMLUListElement;
+  const mobileMenuNavItems = document.getElementsByClassName("mobile-nav-item");
+  let menuIconClosed = document.getElementById(
+    "menu-icon-closed",
+  ) as any as SVGElement;
+  let menuIconOpened = document.getElementById(
+    "menu-icon-opened",
+  ) as any as SVGElement;
+
+  // menu state
+  let isMenuOpen = false;
+
+  // switch menu open / close
+  const switchMenuState = () => {
+    menuIconClosed.style.display = isMenuOpen ? "block" : "none";
+    menuIconOpened.style.display = !isMenuOpen ? "block" : "none";
+    if (isMenuOpen) menuIconClosed = reinitializeIcon(menuIconClosed);
+    else menuIconOpened = reinitializeIcon(menuIconOpened);
+    if (isMenuOpen) {
+      mobileMenuNav.classList.replace(
+        "mobile-menu-nav-opened",
+        "mobile-menu-nav-closed",
+      );
+    } else {
+      mobileMenuNav.classList.replace(
+        "mobile-menu-nav-closed",
+        "mobile-menu-nav-opened",
+      );
+    }
+    isMenuOpen = !isMenuOpen;
+  };
+
+  // click menu item then close menu
+  menuSwitcher.addEventListener("click", switchMenuState);
+  for (let i = 0; i < mobileMenuNavItems.length; ++i) {
+    mobileMenuNavItems.item(i)?.addEventListener("click", switchMenuState);
+  }
+  // click other elements then close menu
+  // 当菜单展开时，如果你点击页面上的其他任何地方，菜单会自动关闭。
+  document.addEventListener("click", (event) => {
+    if (
+      !menuSwitcher.contains(event.target as any) &&
+      !mobileMenuNav.contains(event.target as any) &&
+      isMenuOpen
+    ) {
+      switchMenuState();
+    }
+  });
+
+  // Theme switcher
+  // Get elements
+  const themeSwitcher = document.getElementById(
+    "theme-switcher",
+  ) as HTMLButtonElement;
+  let themeIconLight = document.getElementById(
+    "theme-icon-light",
+  ) as any as SVGElement;
+  let themeIconDark = document.getElementById(
+    "theme-icon-dark",
+  ) as any as SVGElement;
+
+  // Record the current theme
+  let currentTheme = localStorage.getItem("theme") || "light";
+
+  // Set theme
+  const setTheme = (theme: string) => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    currentTheme = theme;
+
+    // Show/hide icons for different themes
+    themeIconDark.style.display = theme === "dark" ? "block" : "none";
+    themeIconLight.style.display = theme === "light" ? "block" : "none";
+
+    // If the theme is dark, update the dark icon; otherwise, update the light icon
+    if (theme === "dark") themeIconDark = reinitializeIcon(themeIconDark);
+    else themeIconLight = reinitializeIcon(themeIconLight);
+
+    // Toggle dark class
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  };
+
+  // Click to switch theme
+  themeSwitcher.addEventListener("click", () => {
+    setTheme(currentTheme === "light" ? "dark" : "light");
+  });
+
+  // Initialize
+  document.addEventListener("DOMContentLoaded", () => {
+    setTheme(currentTheme);
+    menuIconClosed.style.display = "block";
+  });
+
+  // fold nav bar when scroll down
+  const navBarElement = document.getElementById("nav");
+  const bannerElement = document.getElementById("banner");
+  const bannerHeight = bannerElement!.offsetHeight - 50;
+  let lastYPos = 0;
+  window.addEventListener("scroll", () => {
+    if (bannerHeight < window.scrollY && window.scrollY > lastYPos) {
+      navBarElement!.style.top = "-72px";
+    } else {
+      navBarElement!.style.top = "0";
+    }
+    lastYPos = window.scrollY;
+  });
+</script>
+
+<script is:inline>
+  // load pagefind
+  async function loadPagefind() {
+    try {
+      const pagefind = await import("/pagefind/pagefind.js");
+      await pagefind.options({
+        excerptLength: 20,
+      });
+      pagefind.init();
+      window.pagefind = pagefind;
+      pagefind.search("");
+      console.log('Pagefind loaded successfully');
+    } catch (error) {
+      console.warn('Pagefind not available (development mode):', error.message);
+      // Create a mock pagefind object for development
+      window.pagefind = {
+        search: async () => ({ results: [] }),
+        options: async () => {},
+        init: () => {}
+      };
+    }
+  }
+  loadPagefind();
+</script>

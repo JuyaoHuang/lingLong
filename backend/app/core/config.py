@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./data/dataBase.db"
 
     # Astro Project Configuration - Paths in Docker Containers
-    ASTRO_CONTENT_PATH: str = "/code/yukina/src/contents/posts"
-    ASTRO_PROJECT_PATH: str = "/code/yukina"
+    ASTRO_CONTENT_PATH: str = "/code/lingLong/src/contents/posts"
+    ASTRO_PROJECT_PATH: str = "/code/lingLong"
 
     # API config
     API_PREFIX: str = "/api"

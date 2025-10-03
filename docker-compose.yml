@@ -13,13 +13,13 @@ services:
     volumes:
       - ./backend/app:/code/app          # 后端代码
       - ./backend/data:/code/data        # SQLite数据库
-      - ./yukina:/code/yukina            # Astro项目（后端操作Markdown文件）
-      - /code/yukina/node_modules        # 匿名卷：防止宿主机node_modules覆盖容器内的Linux版本
+      - ./lingLong:/code/lingLong            # Astro项目（后端操作Markdown文件）
+      - /code/lingLong/node_modules        # 匿名卷：防止宿主机node_modules覆盖容器内的Linux版本
     # 环境变量
     environment:
       - ENVIRONMENT=production           # 环境标识
-      - ASTRO_CONTENT_PATH=/code/yukina/src/contents/posts
-      - ASTRO_PROJECT_PATH=/code/yukina
+      - ASTRO_CONTENT_PATH=/code/lingLong/src/contents/posts
+      - ASTRO_PROJECT_PATH=/code/lingLong
     # 注意：不对外暴露端口，只通过nginx访问
 
   nginx:
@@ -31,7 +31,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./yukina/dist:/usr/share/nginx/html
+      - ./lingLong/dist:/usr/share/nginx/html
     # 依赖关系：等待backend启动后再启动nginx
     depends_on:
       - backend

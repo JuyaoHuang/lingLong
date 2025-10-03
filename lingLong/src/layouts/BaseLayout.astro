@@ -1,0 +1,17 @@
+---
+import LingLongConfig from "../../linglong.config";
+import BaseHead from "../components/BaseHead.astro";
+---
+
+<html lang={LingLongConfig.locale}>
+  <BaseHead />
+  <body class="overflow-y-hidden">
+    <slot />
+  </body>
+</html>
+
+<style>
+  body {
+    @apply bg-[var(--background-color)];
+  }
+</style>
