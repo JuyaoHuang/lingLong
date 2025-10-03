@@ -1,17 +1,17 @@
 <!--
+  带实时预览功能的 Monaco Markdown 编辑器
+  功能：vs-dark 主题、全屏模式、响应式布局、自定义事件
   Monaco Markdown Editor with Live Preview
   Features: vs-dark theme, fullscreen mode, responsive layout, custom events
 -->
 <script>
   import { onMount, onDestroy } from 'svelte';
 
-  // Props
   export let value = '';
   export let onContentChange = (content) => {};
   export let height = '600px';
   export let placeholder = 'Start writing your markdown content...';
 
-  // Component state
   let editorContainer;
   let editor;
   let isFullscreen = false;
@@ -20,7 +20,7 @@
   let loadingProgress = 'Initializing Monaco Editor...';
   let editorCreated = false; // Prevent multiple creation
 
-  // Responsive breakpoint
+  // 响应断点
   let windowWidth = 0;
   $: isMobile = windowWidth < 1024;
 
@@ -32,7 +32,7 @@
     if (typeof window !== 'undefined') {
       loadingProgress = 'Loading Monaco Editor from CDN...';
 
-      // Add more detailed container checking
+      // Add more detailed container checking--添加更详细的容器检查
       const checkContainer = () => {
         console.log('Checking container...');
         console.log('editorContainer now:', editorContainer);
@@ -45,9 +45,9 @@
             return;
           }
 
-          editorCreated = true; // Mark as in progress
+          editorCreated = true; // 标记为进行中--Mark as in progress
 
-          // Load only Monaco Editor first, skip marked for now
+          // 首先仅加载 Monaco 编辑器，暂时跳过标记--Load only Monaco Editor first, skip marked for now
           loadMonacoFromCDN()
             .then(monaco => {
               console.log('Monaco loaded successfully');
@@ -73,14 +73,12 @@
 
                 console.log('Monaco editor created successfully');
 
-                // Set up content change listener
+                // 设置内容更改监听器 Set up content change listener
                 editor.onDidChangeModelContent(() => {
                   const newValue = editor.getValue();
                   value = newValue;
                   onContentChange(newValue);
                 });
-
-                // Handle window resize
                 const handleResize = () => {
                   isMobile = window.innerWidth < 1024;
                   if (editor) {

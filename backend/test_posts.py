@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Test script to debug posts API issue
 """
@@ -24,7 +23,6 @@ def test_posts_reading():
     for f in md_files:
         print(f"  - {f.name}")
 
-    # Try to load the service function
     print("\n=== Testing Service Function ===")
     try:
         from app.services.post_service import get_all_posts_metadata

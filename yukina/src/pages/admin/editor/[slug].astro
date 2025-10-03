@@ -2,14 +2,18 @@
 /**
  * Edit Post Page
  * Edit existing blog post with Monaco editor
+ * * 编辑帖子页面
+  *  使用 Monaco 编辑器编辑现有博客文章
  */
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import Editor from '../../../components/admin/Editor.svelte';
 import { getCollection } from 'astro:content';
 
 // Server-side: getStaticPaths for dynamic routing
+// 服务器端：getStaticPaths 用于动态路由
 export async function getStaticPaths() {
   try {
+    //获取所有帖子以生成静态路由以供编辑
     // Get all posts to generate static routes for editing
     const posts = await getCollection('posts');
 
@@ -21,11 +25,10 @@ export async function getStaticPaths() {
     });
   } catch (error) {
     console.error('Error in getStaticPaths:', error);
-    // Return empty array if there's an error
     return [];
   }
 }
-
+//服务器端：从 Astro.params 获取 slug
 // Server-side: Get slug from Astro.params
 const { slug } = Astro.params;
 const { post } = Astro.props;
@@ -164,17 +167,17 @@ const { post } = Astro.props;
   <script>
     import { postService } from '../../../services/postService';
 
-    // Client-side variables
+    // 客户端变量--Client-side variables
     let editorAPI: any = null;
     let isSubmitting = false;
     let currentPost: any = null;
 
-    // Get slug from URL (client-side approach)
-    // Filter out empty strings to handle trailing slashes
+    // 从 URL 获取 slug（客户端方法）--Get slug from URL (client-side approach)
+    // 过滤掉空字符串来处理尾部斜杠--Filter out empty strings to handle trailing slashes
     const pathSegments = window.location.pathname.split('/').filter(s => s.length > 0);
     const slug = pathSegments[pathSegments.length - 1];
 
-    // Listen for editor ready event
+    // 监听编辑器就绪事件--Listen for editor ready event
     document.addEventListener('editor-ready', (event: any) => {
       console.log('Editor is ready!');
       editorAPI = event.detail;
@@ -195,17 +198,17 @@ const { post } = Astro.props;
         showLoading(true);
         hideError();
 
-        // Fetch post data
+        // Fetch post data  获取帖子数据
         currentPost = await postService.getPostBySlug(slug);
 
-        // Populate form fields
+        // 填充表单字段--Populate form fields
         populateForm(currentPost);
 
-        // Show form, hide loading
+        // 显示表单，隐藏加载--Show form, hide loading
         showLoading(false);
         showForm(true);
 
-        // Set editor content if editor is ready
+        // 如果编辑器准备就绪，则设置编辑器内容--Set editor content if editor is ready
         if (editorAPI && editorAPI.setValue) {
           editorAPI.setValue(currentPost.content || '');
         }

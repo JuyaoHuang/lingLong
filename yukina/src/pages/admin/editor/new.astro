@@ -2,6 +2,8 @@
 /**
  * New Post Editor Page
  * Create new blog post with Monaco editor
+ * * 新建文章编辑器页面
+  * 使用 Monaco 编辑器创建新文章
  */
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import Editor from '../../../components/admin/Editor.svelte';
@@ -137,15 +139,15 @@ import Editor from '../../../components/admin/Editor.svelte';
     let editorAPI: any = null;
     let isSubmitting = false;
 
-    // Listen for editor ready event
+    // 监听编辑器就绪事件
     document.addEventListener('editor-ready', (event: any) => {
       console.log('Editor is ready!');
       editorAPI = event.detail;
     });
 
-    // Get editor instance when it's loaded
+    // 加载时获取编辑器实例
     document.addEventListener('DOMContentLoaded', () => {
-      // Form setup will be handled by event listeners below
+      // 表单设置将由下面的事件监听器处理
     });
 
     function showError(message: string): void {
@@ -202,7 +204,7 @@ import Editor from '../../../components/admin/Editor.svelte';
       return errors;
     }
 
-    // Form submission
+    // 表单提交
     const postForm = document.getElementById('post-form') as HTMLFormElement | null;
     if (postForm) {
       postForm.addEventListener('submit', async (e: Event) => {

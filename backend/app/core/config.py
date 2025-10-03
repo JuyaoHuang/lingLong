@@ -1,6 +1,8 @@
 """
 FastAPI 应用核心配置
 使用 Pydantic Settings 管理所有环境变量和配置
+FastAPI application core configuration 
+Use Pydantic Settings to manage all environment variables and configurations
 """
 import os
 from pathlib import Path
@@ -14,32 +16,40 @@ class Settings(BaseSettings):
     # JWT 配置
     # 警告：生产环境必须通过环境变量 SECRET_KEY 设置强密钥
     # 可使用命令生成：python -c "import secrets; print(secrets.token_urlsafe(32))"
+    # JWT Configuration
+    # Warning: A strong key must be set via the SECRET_KEY environment variable in production environments
+    # Generate with command: python -c "import secrets; print(secrets.token_urlsafe(32))"
     SECRET_KEY: str = "your KEY"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # 1天
 
-    # 数据库配置
+    # Database Configuration
     DATABASE_URL: str = "sqlite:///./data/dataBase.db"
 
-    # Astro 项目配置 - Docker容器内的路径
+    # Astro Project Configuration - Paths in Docker Containers
     ASTRO_CONTENT_PATH: str = "/code/yukina/src/contents/posts"
     ASTRO_PROJECT_PATH: str = "/code/yukina"
 
-    # API 配置
+    # API config
     API_PREFIX: str = "/api"
     PROJECT_NAME: str = "Blog Backend API"
     VERSION: str = "1.0.0"
     DESCRIPTION: str = "博客管理后端API"
 
-    # 环境配置
+    # environment config
     ENVIRONMENT: str = "production"  # development | production
 
     # CORS 配置 - 允许跨域来源
     # 开发环境：可设置为空使用默认的本地端口
     # 生产环境：必须在 .env 中明确指定域名，如：ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+    # CORS Configuration - Allow Cross-Origin Origins
+    # Development Environment: Leave this blank to use the default local port
+    # Production Environment: Requires the domain name to be explicitly specified in .env, e.g.,
+    # ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
     ALLOWED_ORIGINS: Optional[str] = None
 
     # 本地开发端口范围配置
+    # Local development port range configuration
     LOCAL_PORT_RANGE_START: int = 4321
     LOCAL_PORT_RANGE_END: int = 5000
 
@@ -47,35 +57,41 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
-# 创建全局设置实例
 settings = Settings()
 
 # 处理 ALLOWED_ORIGINS 配置
+# Handling ALLOWED_ORIGINS Configuration
 def get_allowed_origins() -> list[str]:
     """
     获取允许的跨域来源列表
 
     开发环境：使用本地端口范围
     生产环境：从 .env 读取域名列表（逗号分隔）
+
+    Get the list of allowed cross-origin origins
+    Development environment: Use the local port range
+    Production environment: Read a comma-delimited list of domains from .env
     """
     if settings.ALLOWED_ORIGINS:
         # 从环境变量读取，支持逗号分隔的多个域名
+        # Read from environment variables, support comma-separated multiple domain names
         return [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",")]
 
     # 默认开发环境配置
+    # Default development environment configuration
     return (
-        # 基础端口
         ["http://localhost:3000", "http://127.0.0.1:3000"] +
-        # 开发端口范围 (localhost)
+        # 开发端口范围
+        # Development port range
         [f"http://localhost:{port}" for port in range(settings.LOCAL_PORT_RANGE_START, settings.LOCAL_PORT_RANGE_END + 1)] +
-        # 开发端口范围 (127.0.0.1)
         [f"http://127.0.0.1:{port}" for port in range(settings.LOCAL_PORT_RANGE_START, settings.LOCAL_PORT_RANGE_END + 1)]
     )
 
 # 全局 CORS 配置
+# Global CORS Configuration
 ALLOWED_ORIGINS = get_allowed_origins()
 
-# 安全检查：生产环境必须使用强密钥
+# 安全检查--security check
 if settings.ENVIRONMENT == "production" and "INSECURE" in settings.SECRET_KEY:
     import sys
     print("\n" + "="*60)
@@ -92,7 +108,6 @@ if settings.ENVIRONMENT == "production" and "INSECURE" in settings.SECRET_KEY:
     print("="*60 + "\n")
     sys.exit(1)
 
-# 确保关键目录存在
 def ensure_directories():
     """确保必要的目录存在"""
     astro_content_path = Path(settings.ASTRO_CONTENT_PATH)
@@ -102,5 +117,4 @@ def ensure_directories():
     database_dir.mkdir(parents=True, exist_ok=True)
 
 
-# 初始化时调用
 ensure_directories()

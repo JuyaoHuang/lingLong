@@ -1,8 +1,11 @@
 """
 安全认证模块
 处理密码哈希、JWT创建和验证、用户认证等安全相关功能
+Security Authentication Module: 
+Handles security-related functions such as password hashing, 
+JWT creation and verification, and user authentication.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -16,36 +19,38 @@ from .config import settings
 
 
 # 密码加密上下文
+# Password encryption context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 密码认证
+# OAuth2 Password Authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """验证密码"""
+    """验证密码--Verify Password"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    """获取密码哈希"""
+    """获取密码哈希--Get hash password"""
     return pwd_context.hash(password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """创建访问令牌"""
+    """创建访问令牌-Create an access token"""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
 def verify_token(token: str) -> Optional[str]:
-    """验证令牌并返回用户名"""
+    """验证令牌并返回用户名--Verify the token and return the username"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
@@ -57,12 +62,12 @@ def verify_token(token: str) -> Optional[str]:
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    """获取当前用户 - FastAPI 依赖项"""
+    """获取当前用户 - FastAPI 依赖项--Get the current user"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
-    )
+    )                                                                                   
 
     username = verify_token(token)
     if username is None:
@@ -75,8 +80,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-# 可选的：检查用户是否为管理员的依赖项（如果将来需要多角色）
 def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
-    """获取当前管理员用户"""
+    """获取当前管理员用户--Get the current administrator user"""
     # 目前所有用户都是管理员，如果将来需要角色系统可以在这里添加检查
+    # Currently all users are administrators. 
+    # If a role system is needed in the future, you can add a check here
     return current_user

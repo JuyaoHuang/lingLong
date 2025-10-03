@@ -20,7 +20,6 @@ def create_simple_admin():
     cursor = conn.cursor()
 
     try:
-        # Check if user exists
         cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",))
         if cursor.fetchone():
             print("Admin user already exists!")

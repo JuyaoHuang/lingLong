@@ -15,7 +15,6 @@ const posts = defineCollection({
     description: z.string().optional(),
     cover: z.string().optional(),// 文章封面图片
     tags: z.array(z.string()).optional(),
-    // category: z.string().optional(),
     first_level_category: z.string(),//一级标题
     second_level_category:z.string(),//二级标题
     author: z.string().optional(),

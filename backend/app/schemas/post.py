@@ -1,4 +1,6 @@
 """
+后置相关的 Pydantic API 数据契约模型
+必须与 Astro 前端 content.config.ts 架构完全匹配
 Post-related Pydantic models for API data contracts
 Must match the Astro frontend content.config.ts schema exactly
 """
@@ -9,6 +11,8 @@ from datetime import datetime, date
 
 class PostMetadata(BaseModel):
     """
+    帖子元数据模型 - 匹配前端 AdminPostCard.astro Props 接口
+    用于显示不包含内容主体的文章列表
     Post metadata model - matches frontend AdminPostCard.astro Props interface
     Used for article list display without content body
     """
@@ -29,6 +33,8 @@ class PostMetadata(BaseModel):
 
 class PostCreate(BaseModel):
     """
+    文章创建模型 - 用于创建新文章
+    内容字段与元数据分离
     Post creation model - for creating new articles
     Content field separated from metadata
     """
@@ -49,6 +55,8 @@ class PostCreate(BaseModel):
 
 class PostUpdate(BaseModel):
     """
+    更新后模型 - 用于更新现有文章
+    所有字段均为可选字段，以允许部分更新
     Post update model - for updating existing articles
     All fields optional to allow partial updates
     """
@@ -69,6 +77,8 @@ class PostUpdate(BaseModel):
 
 class PostFull(PostMetadata):
     """
+    完整的帖子模型 - 包含内容主体
+    用于查看和编辑文章详情
     Complete post model - includes content body
     Used for article detail view and editing
     """
@@ -77,6 +87,7 @@ class PostFull(PostMetadata):
 
 class PostResponse(BaseModel):
     """
+    后期操作的标准 API 响应
     Standard API response for post operations
     """
     success: bool

@@ -1,4 +1,6 @@
 <!--
+  帖子管理表组件
+  功能：CRUD 操作、类别过滤、响应式设计
   Posts Management Table Component
   Features: CRUD operations, category filtering, responsive design
 -->
@@ -6,7 +8,6 @@
   import { onMount } from 'svelte';
   import { postService } from '../../services/postService';
 
-  // Component state
   let posts = [];
   let loading = true;
   let error = '';
@@ -15,7 +16,6 @@
   let showDeleteModal = false;
   let postToDelete = null;
 
-  // Reactive computed values
   $: filteredPosts = posts.filter(post => {
     const matchesSearch = !searchTerm ||
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,7 +31,6 @@
     `${post.first_level_category}/${post.second_level_category}`
   ))].sort();
 
-  // Load posts on component mount
   onMount(async () => {
     await loadPosts();
   });
