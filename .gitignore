@@ -159,7 +159,7 @@ lingLong/src/pages/en
 lingLong/src/pages/ja
 
 lingLong/.pnpm-store/v3/
-lingLong/src/contents/
+# lingLong/src/contents/
 lingLong/build-output.log
 
 
@@ -179,3 +179,4 @@ backend/app/services/__pycache__/
 DockerHub推送问题.md
 you.md
 .claude
+DEPLOYMENT_CHECKLIST.md
