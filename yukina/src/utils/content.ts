@@ -1,6 +1,28 @@
 import { getCollection } from "astro:content";
 import { IdToSlug } from "./hash";
 
+// 字数统计函数，支持中文
+function countWords(text: string): number {
+  // 移除代码块、HTML标签等
+  const cleanText = text
+    .replace(/```[\s\S]*?```/g, '') // 移除代码块
+    .replace(/<[^>]*>/g, '') // 移除HTML标签
+    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
+    .replace(/\[.*?\]\(.*?\)/g, ''); // 移除链接
+
+  // 统计中文字符（包括中文标点）
+  const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+
+  // 统计英文单词（通过空格分割）
+  const englishWords = cleanText
+    .replace(/[\u4e00-\u9fa5]/g, ' ') // 将中文字符替换为空格
+    .split(/\s+/)
+    .filter(word => word.length > 0).length;
+
+  // 返回中文字符数 + 英文单词数
+  return chineseChars + englishWords;
+}
+
 // ================== 二级分类系统改进总结 ==================
 //
 // 本文件实现了从单级分类到二级分类系统的重要改进：
@@ -45,10 +67,10 @@ export interface Archive {
 
 /*
   修改：新增用于二级分类板块的文章对象接口
-  与原来的Archive接口不同，这个接口包含了完整的PostCard所需数据
+  与原来的Archive接口不同，这个接口包含了完整的postCard所需数据
   用于在二级分类页面以卡片形式展示文章
 */
-export interface postCard{
+export interface postCard {
   id: string;
   title: string;
   published: Date;
@@ -58,7 +80,7 @@ export interface postCard{
   tags?: string[];
   description?: string;
   image?: string;
-  readingMetadata?: { time: number; wordCount: number };
+  readingMetadata?: { wordCount: number };
 }
 
 /**
@@ -66,7 +88,7 @@ export interface postCard{
  * 包含分类名，完整的分类路径URL，和该分类下的文章数组
  * 用于构建二级分类页面的路由和数据
  */
-export interface secondCategory{
+export interface SecondCategory {
   name:string;        // 二级分类名称，如 "Python", "Vue"
   slug:string;        // 完整路径，如 "/categories/编程合集/python"
   posts:postCard[];   // 该分类下的所有文章
@@ -83,10 +105,10 @@ export interface Tag {
 
 /**
  * 修改：更新一级分类接口名称和注释
- * 原来叫 Category，现在改为 fisrtCategory 以区分一级和二级分类
+ * 原来叫 Category，现在改为 FirstCategory 以区分一级和二级分类
  * 包含一级分类名、URL路径和该分类下的所有文章（简化版Archive对象）
  */
-export interface fisrtCategory {
+export interface FirstCategory {
   name: string;      // 一级分类名称，如 "编程合集", "AI前沿"
   slug: string;      // 一级分类URL路径，如 "/categories/编程合集"
   posts: Archive[];  // 该分类下的所有文章（简化版，用于归档显示）
@@ -110,6 +132,14 @@ export async function GetSortedPosts() {
     const dateB = new Date(b.data.published);
     return dateA > dateB ? -1 : 1;
   });
+
+  // 计算字数并注入到 data 中
+  for (const post of sorted) {
+    const wordCount = countWords(post.body ||'');
+    (post.data as any).readingMetadata = {
+      wordCount: wordCount,
+    };
+  }
 
   for (let i = 1; i < sorted.length; i++) {
     (sorted[i].data as any).nextSlug = (sorted[i - 1] as any).slug;
@@ -224,7 +254,7 @@ export async function getFirstCategories() {
     return import.meta.env.PROD ? data.draft !== true : true;
   });
 
-  const categories = new Map<string, fisrtCategory>();
+  const categories = new Map<string, FirstCategory>();
 
   allBlogPosts.forEach((post) => {
     if (!post.data.first_level_category) return;
@@ -257,7 +287,7 @@ export async function getFirstCategories() {
  * 构建完整的二级分类路径：/categories/一级分类/二级分类
  * 返回的文章数据为完整的 postCard 格式，支持卡片式展示
  *
- * @returns 一个Map，键为完整的二级分类路径，值为包含该分类信息和文章列表的对象
+ * @returns 包含分类Map和原始文章列表的对象，避免重复调用 getCollection
  * 用途：生成二级分类页面 (/categories/[first_category]/[second_category].astro)
  */
 export async function getSecondCategories() {
@@ -265,7 +295,7 @@ export async function getSecondCategories() {
     return import.meta.env.PROD ? data.draft !== true : true;
   });
 
-  const categories = new Map<string, secondCategory>();
+  const categories = new Map<string, SecondCategory>();
 
   allBlogPosts.forEach((post) => {
     if (!post.data.second_level_category || !post.data.first_level_category) return;
@@ -279,22 +309,28 @@ export async function getSecondCategories() {
         posts: [],
       });
     }
+
+    // 计算字数
+    const wordCount = countWords(post.body || '');
+
     // 对象下的 posts 数组内部的值
     categories.get(categorySlug)!.posts.push({
       title: post.data.title,
-      id: post.id, // 【修复】传递原始文档ID，让PostCard组件自己处理URL生成
+      id: post.id, // 传递原始文档ID，让postCard组件自己处理URL生成
       published: new Date(post.data.published),
       tags: post.data.tags,
-      readingMetadata:post.data.readingMetadata,
+      readingMetadata: {
+        wordCount: wordCount,
+      },
       description:post.data.description,
       image:post.data.cover,
-      // 【新增】传递分类信息给PostCard组件显示
+      // 传递分类信息给postCard组件显示
       first_level_category: post.data.first_level_category,
       second_level_category: post.data.second_level_category,
     });
   });
 
-  // 【新增】对每个分类下的文章按发布日期降序排序（最新的在前）
+  // 对每个分类下的文章按发布日期降序排序（最新的在前）
   categories.forEach((category) => {
     category.posts.sort((a, b) => {
       const dateA = new Date(a.published);
@@ -303,7 +339,11 @@ export async function getSecondCategories() {
     });
   });
 
-  return categories;
+  // 返回分类Map和原始文章数据，避免在页面中再次调用 getCollection
+  return {
+    categoriesMap: categories,
+    allPosts: allBlogPosts
+  };
 }
 // export interface postCard{
 //   id: string;

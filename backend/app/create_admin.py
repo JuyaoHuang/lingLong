@@ -1,4 +1,6 @@
 """
+创建初始管理员用户脚本
+运行此脚本在数据库中创建第一个管理员用户
 Create initial admin user script
 Run this script to create the first admin user in the database
 """
@@ -11,14 +13,12 @@ from app.core.security import get_password_hash
 
 def create_admin_user():
     """Create initial admin user"""
-    # Create database tables
     create_tables()
 
     # Create database session
     db = SessionLocal()
 
     try:
-        # Check if admin user already exists
         existing_user = db.query(User).filter(User.username == "admin").first()
 
         if existing_user:
@@ -28,7 +28,7 @@ def create_admin_user():
             return
 
         # Create new admin user
-        admin_password = "admin"  # Simplified password
+        admin_password = "admin"  # modify the password to make it complex
         hashed_password = get_password_hash(admin_password)
 
         admin_user = User(

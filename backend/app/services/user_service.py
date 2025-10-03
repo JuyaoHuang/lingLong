@@ -31,10 +31,8 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
         2. If user exists, verify password hash
         3. Return user object if password correct, otherwise return None
     """
-    # 从数据库查找用户 - Find user from database
     user = db.query(User).filter(User.username == username).first()
 
-    # 用户不存在 - User does not exist
     if not user:
         return None
 
@@ -42,7 +40,6 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     if not verify_password(password, user.hashed_password):
         return None
 
-    # 验证通过，返回用户对象 - Verification passed, return user object
     return user
 
 

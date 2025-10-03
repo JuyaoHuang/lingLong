@@ -2,12 +2,37 @@
 FastAPI博客后端应用程序 - FastAPI Blog Backend Application
 主应用程序入口点，包含路由配置和中间件设置 - Main application entry point with route configuration and middleware setup
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .core.config import settings
+
+from .core.config import settings, ALLOWED_ORIGINS
 from .data.database import create_tables
 from .api import auth, posts
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    应用程序生命周期管理 - Application lifespan management
+
+    启动时：创建数据库表
+    关闭时：清理资源（如需要）
+
+    Startup: Create database tables
+    Shutdown: Cleanup resources (if needed)
+    """
+    # 启动时执行 - Execute on startup
+    create_tables()
+    print("Database tables created/verified")
+    print(f"API Documentation available at: http://localhost:8000/docs")
+    print(f"Authentication endpoint: POST /token")
+    print(f"Admin posts endpoint: {settings.API_PREFIX}/admin/posts")
+
+    yield  # 应用程序运行期间 - Application running
+
+    print("Shutting down...")
+
 
 # 创建FastAPI应用程序实例 - Create FastAPI application instance
 app = FastAPI(
@@ -15,13 +40,14 @@ app = FastAPI(
     version=settings.VERSION,
     description=settings.DESCRIPTION,
     docs_url="/docs",  # Swagger UI文档 - Swagger UI documentation
-    redoc_url="/redoc"  # ReDoc文档 - ReDoc documentation
+    redoc_url="/redoc",  # ReDoc文档 - ReDoc documentation
+    lifespan=lifespan  # 使用生命周期管理器 - Use lifespan manager
 )
 
 # 配置CORS中间件 - Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -53,22 +79,3 @@ async def root():
         "version": settings.VERSION,
         "project": settings.PROJECT_NAME
     }
-
-# 启动时创建数据库表 - Create database tables on startup
-@app.on_event("startup")
-async def startup_event():
-    """
-    应用程序启动事件 - Application startup event
-
-    功能说明：
-    - 确保数据库表已创建
-    - 在应用启动时自动执行
-    - 输出关键的API端点信息供开发者参考
-
-    Ensures database tables are created
-    """
-    create_tables()
-    print("Database tables created/verified")
-    print(f"API Documentation available at: http://localhost:8000/docs")
-    print(f"Authentication endpoint: POST /token")
-    print(f"Admin posts endpoint: {settings.API_PREFIX}/admin/posts")

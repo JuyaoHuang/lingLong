@@ -1,0 +1,119 @@
+---
+/**
+ * Admin Layout
+ * Layout component for admin panel pages
+ */
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Blog Admin Panel" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} - Admin Panel</title>
+
+    <!-- Admin-specific styles -->
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #1e293b;
+      }
+
+      .admin-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .admin-header {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      }
+
+      .admin-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+        color: #64748b;
+      }
+
+      @media (max-width: 768px) {
+        .admin-content {
+          padding: 1rem;
+        }
+        .admin-header {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="admin-container">
+      <!-- Admin Header -->
+      <header class="admin-header">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-xl font-bold text-gray-900">Blog Admin</h1>
+          <nav class="hidden md:flex space-x-4">
+            <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+            <a href="/admin/editor/new" class="text-gray-600 hover:text-gray-900">New Post</a>
+          </nav>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600">Admin User</span>
+          <button
+            id="logout-btn"
+            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="admin-content">
+        <slot />
+      </main>
+    </div>
+
+    <!-- Logout functionality -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin/login';
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -10,11 +10,11 @@ import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkMath from "remark-math";
-import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
 import YukinaConfig from "./yukina.config";
 
 import pagefind from "astro-pagefind";
+import removeConsole from "vite-plugin-remove-console";
 
 // https://astro.build/config
 export default defineConfig({
@@ -37,11 +37,19 @@ export default defineConfig({
     sitemap(),
     pagefind(),
   ],
+  vite: {
+    plugins: [
+      // 只在生产构建时移除 console
+      removeConsole({
+        external: ['error', 'warn'], // 保留 console.error 和 console.warn
+      }),
+    ],
+  },
   markdown: {
     shikiConfig: {
       theme: "github-dark-default",
     },
-    remarkPlugins: [remarkReadingTime, remarkMath],
+    remarkPlugins: [remarkMath],
     rehypePlugins: [
       rehypeSlug,
       rehypeKatex,

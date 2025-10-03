@@ -1,27 +1,22 @@
 ---
 import MainLayout from "../../../layouts/MainLayout.astro";
 import PostCard from '../../../components/PostCard.astro'; // 复用主页的文章卡片组件
-import { getSecondCategories,type postCard } from "../../../utils/content";
+import { getSecondCategories, type postCard } from "../../../utils/content";
 import { IdToSlug } from "../../../utils/hash"; // 确保引入了 IdToSlug
-import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  // 1. 【数据获取】调用getSecondCategories函数，一次性获取所有处理好的二级分类数据
-  // 这个函数返回一个Map，其中包含了所有二级分类的信息和对应的文章列表
-  const categoriesMap = await getSecondCategories();
+  // [数据获取 - 优化] 一次性获取所有数据，避免重复调用 getCollection
+  // 这个函数现在返回 { categoriesMap, allPosts }，包含所有需要的数据
+  const { categoriesMap, allPosts } = await getSecondCategories();
 
-  // 获取所有文章来找到一级分类的原始名称
-  // 【重要】这是为了在页面显示时能够显示原始的分类名称，而不是hash值
-  const allPosts = await getCollection('posts');
-
-  // 2. 【路由生成】遍历这个 Map，为每个二级分类生成对应的静态路由
+  // [路由生成] 遍历这个 Map，为每个二级分类生成对应的静态路由
   return Array.from(categoriesMap.values()).map(category => {
   // 【核心修复】从 slug 中解析出正确的URL参数
   // category.slug的格式是："/categories/hash(一级分类)/hash(二级分类)"
   // 例如："/categories/5a96f8ab/872c1fa1"
   const slugParts = category.slug.split('/').filter(Boolean); // ['categories', '5a96f8ab', '872c1fa1']
 
-    // 【关键】找到对应的一级分类原始名称，用于页面显示
+    // [关键] 找到对应的一级分类原始名称，用于页面显示
     // 通过hash值反向查找到原始分类名
     const firstCategoryName = allPosts.find(post =>
       IdToSlug(post.data.first_level_category) === slugParts[1]
@@ -29,11 +24,11 @@ export async function getStaticPaths() {
 
     return {
       params: {
-        // 【重要】这里的参数必须与URL中的hash值完全一致，解决404问题
+        // [重要] 这里的参数必须与URL中的hash值完全一致，解决404问题
         first_category: slugParts[1], // hash化的一级分类，如："5a96f8ab"
         second_category: slugParts[2] // hash化的二级分类，如："872c1fa1"
       },
-      // 3. 【数据传递】将处理好的数据作为 props 传递给页面组件
+      // [数据传递] 将处理好的数据作为 props 传递给页面组件
       props: {
         posts: category.posts, // 该二级分类下的所有文章，已经是postCard[]格式
         secondCategoryName: category.name, // 二级分类的原始名称，用于显示
@@ -43,25 +38,25 @@ export async function getStaticPaths() {
   });
 }
 
-// 4. 【数据接收】从props中接收页面所需的数据
+// [数据接收] 从props中接收页面所需的数据
 const { posts, secondCategoryName, firstCategoryName } = Astro.props;
-// 5. 【URL参数】从params中获取hash化的分类名（主要用于URL处理，不用于显示）
-const { first_category, second_category } = Astro.params;
+// [URL参数] 从params中获取hash化的分类名（主要用于URL处理，不用于显示）
+// const { first_category, second_category } = Astro.params;
 
 ---
 
-<!-- 【页面布局】使用MainLayout作为基础布局，传入页面标题 -->
+<!-- [页面布局]使用MainLayout作为基础布局，传入页面标题 -->
 <MainLayout title={`${firstCategoryName} - ${secondCategoryName}`}>
-  <!-- 【页面标题】显示原始的分类名称，提供良好的用户体验 -->
+  <!-- [页面标题] 显示原始的分类名称，提供良好的用户体验 -->
   <h1 class="text-3xl font-bold mb-2">板块: {firstCategoryName}</h1>
   <h2 class="text-xl text-gray-600 mb-8">专题: {secondCategoryName}</h2>
 
-  <!-- 【文章展示】使用网格布局展示该二级分类下的所有文章 -->
+  <!-- [文章展示] 使用网格布局展示该二级分类下的所有文章 -->
   <!-- 响应式设计：手机单列，平板双列，桌面三列 -->
    <!--  md:grid-cols-2 lg:grid-cols-3  -->
   <div class="grid grid-cols-1 gap-4">
     {/*
-      【核心功能】遍历posts数组，为每篇文章渲染PostCard组件
+      [核心功能] 遍历posts数组，为每篇文章渲染PostCard组件
       posts数组中的每个元素都是postCard格式，包含了卡片展示所需的所有数据：
       - id: 文章ID，用于生成链接
       - title: 文章标题
