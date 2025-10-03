@@ -30,12 +30,12 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY backend/app /code/app
 
 # 创建前端项目目录并复制依赖文件
-RUN mkdir -p /code/yukina
-COPY yukina/package.json /code/yukina/package.json
-COPY yukina/pnpm-lock.yaml /code/yukina/pnpm-lock.yaml
+RUN mkdir -p /code/lingLong
+COPY lingLong/package.json /code/lingLong/package.json
+COPY lingLong/pnpm-lock.yaml /code/lingLong/pnpm-lock.yaml
 
 # 在构建时安装前端依赖
-RUN cd /code/yukina && pnpm install --frozen-lockfile
+RUN cd /code/lingLong && pnpm install --frozen-lockfile
 
 # 暴露端口
 EXPOSE 8000

@@ -19,7 +19,7 @@ services:
       - ./data:/code/data
       # 挂载前端的posts目录，让后端能读取markdown文件
       # Mount the posts directory on the front end so that the back end can read the markdown file
-      - ../yukina/src/contents/posts:/code/yukina/src/contents/posts
+      - ../lingLong/src/contents/posts:/code/lingLong/src/contents/posts
     # 覆盖 Dockerfile 中的 CMD，使用 --reload 参数开启热重载
     # Override the CMD in the Dockerfile and use the --reload parameter to enable hot reload
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

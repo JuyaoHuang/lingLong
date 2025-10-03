@@ -1,0 +1,217 @@
+---
+import { Icon } from "astro-icon/components";
+import LingLongConfig from "../../linglong.config";
+import { i18n } from "../locales/translation";
+import I18nKeys from "../locales/keys";
+import { getFirstCategories, GetTags } from "../utils/content";
+// 博客设计的侧边栏/页脚组件，主要用于在小屏幕（手机、平板）上显示。
+// 它动态地展示了博主信息、文章分类、文章标签，并在列表过长时提供“查看更多”的链接。
+// 在电脑等大屏幕上，这些卡片会被隐藏。
+
+const categories = await getFirstCategories();
+const tags = await GetTags();
+
+const categoryKeys = [...categories.keys()];
+const tagKeys = [...tags.keys()];
+---
+
+<div class="mx-3 space-y-4">
+  <!-- Owner info card -->
+  <div class="rounded-3xl bg-[var(--card-color)] transition-all lg:hidden">
+    <!-- lg:hidden 这个类意味着在“lg”（大屏幕）及以上的尺寸下，这张卡片是隐藏的 -->
+    <!-- 动态内容:
+        头像、用户名、签名、社交链接都是从 LingLongConfig 配置文件中动态读取的。
+        它使用 .map() 函数遍历 LingLongConfig.socialLinks 数组，为每一个社交链接生成一个带图标的 <a> 标签。
+    -->
+    <div class="flex flex-row md:flex-col md:pt-4">
+      <a href="/about" class="relative h-40 w-40 md:hidden">
+        <img
+          class="lozad absolute left-0 top-0 h-40 rounded-l-3xl"
+          data-src={LingLongConfig.avatarUrl}
+          alt="Avatar"
+        />
+        <div
+          class="absolute right-0 top-0 h-40 w-20 bg-gradient-to-l from-[var(--card-color)]"
+        >
+        </div>
+      </a>
+      <a
+        class="mx-auto hidden h-40 w-40 cursor-pointer rounded-3xl transition-all hover:brightness-75 md:block"
+      >
+        <img
+          class="lozad h-40 rounded-3xl"
+          data-src={LingLongConfig.avatarUrl}
+          alt="Avatar"
+        />
+      </a>
+      <div class="flex grow flex-col justify-center space-y-4 p-4">
+        <div class="flex flex-col items-center">
+          <a
+            href="/about"
+            class="line-clamp-1 text-xl font-semibold text-[var(--text-color)]"
+          >
+            {LingLongConfig.username}
+          </a>
+          <span class="mb-2 mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)]"
+          ></span>
+          <p class="line-clamp-1 text-[var(--text-color-lighten)]">
+            {LingLongConfig.sign}
+          </p>
+        </div>
+        <ul class="flex flex-row items-center justify-center space-x-6">
+          {
+            LingLongConfig.socialLinks.map((item) => (
+              <li>
+                <a href={item.link} class="text-[var(--primary-color)]">
+                  <Icon name={item.icon} size={24} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category card -->
+   <!-- lg:hidden 说明此处也会被隐藏 -->
+  <div class="rounded-3xl bg-[var(--card-color)] p-4 transition-all lg:hidden">
+    <div class="mb-2 flex flex-row items-center space-x-2 pl-1.5">
+      <span class="h-6 w-1 rounded-full bg-[var(--primary-color)]"></span>
+      <span class="text-xl font-semibold text-[var(--text-color)]">
+        {i18n(I18nKeys.side_bar_categories)}
+      </span>
+    </div>
+    <div class="relative grid grid-cols-2 gap-1 md:grid-cols-3">
+      {
+        categoryKeys
+          .slice(0, LingLongConfig.maxFooterCategoryChip)
+          .map((category) => (
+            <a
+              href={`/categories/${category}`}
+              class="category flex flex-row items-center justify-between rounded-lg px-2 py-1.5 transition-all hover:bg-[var(--primary-color-lighten)]"
+            >
+              <p class="line-clamp-1 text-[var(--text-color)] transition-all">
+                {categories.get(category)!.name}
+              </p>
+              <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
+                {categories.get(category)!.posts.length}
+              </span>
+            </a>
+          ))
+      }
+      {
+        categoryKeys.length > LingLongConfig.maxFooterCategoryChip && (
+          <a
+            href={`/categories/${categoryKeys[LingLongConfig.maxFooterCategoryChip]}`}
+            class="category col-span-2 flex flex-row items-center justify-between rounded-lg px-2 py-1.5 transition-all hover:bg-[var(--primary-color-lighten)] md:col-span-3"
+          >
+            <p class="line-clamp-1 text-[var(--text-color)] transition-all">
+              {
+                categories.get(
+                  categoryKeys[LingLongConfig.maxFooterCategoryChip],
+                )!.name
+              }
+            </p>
+            <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
+              {
+                categories.get(
+                  categoryKeys[LingLongConfig.maxFooterCategoryChip],
+                )!.posts.length
+              }
+            </span>
+          </a>
+          <div class="absolute bottom-0 flex h-11 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
+            <a
+              href="/categories/"
+              class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
+            >
+            <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+                <Icon name="mingcute:arrow-right-line" />
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <!-- Tag card -->
+  <div class="rounded-3xl bg-[var(--card-color)] p-4 transition-all lg:hidden">
+    <div class="mb-2 flex flex-row items-center space-x-2 pl-1.5">
+      <span class="h-6 w-1 rounded-full bg-[var(--primary-color)]"></span>
+      <span class="text-xl font-semibold text-[var(--text-color)]">
+        {i18n(I18nKeys.side_bar_tags)}
+      </span>
+    </div>
+    <div class="relative flex flex-row flex-wrap">
+      {
+        tagKeys.slice(0, LingLongConfig.maxFooterTagChip + 1).map((tag) => (
+          <a
+            href={`/tags/${tag}`}
+            class="tag m-1 rounded-md bg-[var(--primary-color-lighten)] px-2 py-1 transition-all hover:brightness-95"
+          >
+            <p class="text-sm text-[var(--primary-color)]">
+              {tags.get(tag)!.name}
+            </p>
+          </a>
+        ))
+      }
+      {
+        tagKeys.length >= LingLongConfig.maxFooterCategoryChip + 1 && (
+          <div class="absolute bottom-0 flex h-10 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
+            <a
+              href="/tags/"
+              class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
+            >
+              <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+              <Icon name="mingcute:arrow-right-line" />
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <!-- Site footer -->
+  <footer>
+    <div
+      class="divide-y divide-dashed divide-black/25 py-4 lg:pt-0 dark:divide-white/25"
+    >
+      <div></div>
+      <div></div>
+    </div>
+    <div
+      class="flex w-full flex-col items-center text-sm text-[var(--text-color-lighten)]"
+    >
+      <p>
+        {new Date().getFullYear()}
+        {LingLongConfig.username} 
+      </p>
+      <!-- <p>
+        Powered By <a
+          class="link"
+          href="https://github.com/WhitePaper233/yukina">Yukina</a
+        > & <a class="link" href="https://astro.build/">Astro</a>
+      </p>
+      <p>
+        <a class="link" href={new URL("sitemap-index.xml", LingLongConfig.site)}
+          >SiteMap</a
+        > / <a class="link" href="/rss.xml">RSS</a>
+      </p> -->
+    </div>
+  </footer>
+</div>
+
+<style>
+  .link {
+    @apply text-[var(--primary-color)] transition-all hover:brightness-110;
+  }
+
+  .category {
+    font-family: var(--primary-font);
+  }
+
+  .category:hover > p {
+    @apply pl-2 text-[var(--primary-color)];
+  }
+</style>
