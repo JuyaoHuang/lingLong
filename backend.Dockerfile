@@ -1,28 +1,25 @@
 # 集成部署用的完整版 Dockerfile
 # 用途：在根目录使用，构建上下文是项目根目录，可以访问整个项目文件
-# Complete Dockerfile for integrated deployment
-# Usage: Used in the root directory. 
-# The build context is the project root directory, allowing access to all project files.
+
 FROM python:3.11-slim-bookworm
 
 USER root
 
 # 安装必要的系统依赖
-# Install necessary system dependencies
 RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
 
 # 安装 Node.js----后端运行pnpm build脚本需要
-# Install Node.js - required to run the pnpm build script on the backend
 ENV NODE_VERSION=22
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs
 
 # 配置 npm 镜像源并安装 pnpm
-# Configure the npm mirror source and install pnpm
 RUN npm config set registry https://registry.npmmirror.com && npm install -g pnpm
 
+# 设置工作目录
 WORKDIR /code
 
+# 配置 PIP 清华源
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 复制并安装 Python 依赖
@@ -40,6 +37,7 @@ COPY yukina/pnpm-lock.yaml /code/yukina/pnpm-lock.yaml
 # 在构建时安装前端依赖
 RUN cd /code/yukina && pnpm install --frozen-lockfile
 
+# 暴露端口
 EXPOSE 8000
 
 # 启动命令

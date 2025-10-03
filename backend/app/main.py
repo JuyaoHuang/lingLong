@@ -29,7 +29,8 @@ async def lifespan(app: FastAPI):
     print(f"Authentication endpoint: POST /token")
     print(f"Admin posts endpoint: {settings.API_PREFIX}/admin/posts")
 
-    yield 
+
+    yield  # 应用程序运行期间 - Application running
 
     print("Shutting down...")
 

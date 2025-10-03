@@ -59,6 +59,8 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# 处理 ALLOWED_ORIGINS 配置
+# Handling ALLOWED_ORIGINS Configuration
 def get_allowed_origins() -> list[str]:
     """
     获取允许的跨域来源列表
@@ -71,18 +73,25 @@ def get_allowed_origins() -> list[str]:
     Production environment: Read a comma-delimited list of domains from .env
     """
     if settings.ALLOWED_ORIGINS:
+        # 从环境变量读取，支持逗号分隔的多个域名
+        # Read from environment variables, support comma-separated multiple domain names
         return [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",")]
 
     # 默认开发环境配置
     # Default development environment configuration
     return (
         ["http://localhost:3000", "http://127.0.0.1:3000"] +
+        # 开发端口范围
+        # Development port range
         [f"http://localhost:{port}" for port in range(settings.LOCAL_PORT_RANGE_START, settings.LOCAL_PORT_RANGE_END + 1)] +
         [f"http://127.0.0.1:{port}" for port in range(settings.LOCAL_PORT_RANGE_START, settings.LOCAL_PORT_RANGE_END + 1)]
     )
 
+# 全局 CORS 配置
+# Global CORS Configuration
 ALLOWED_ORIGINS = get_allowed_origins()
 
+# 安全检查--security check
 if settings.ENVIRONMENT == "production" and "INSECURE" in settings.SECRET_KEY:
     import sys
     print("\n" + "="*60)

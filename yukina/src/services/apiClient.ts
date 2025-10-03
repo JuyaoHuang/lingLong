@@ -15,9 +15,6 @@ class ApiClient {
   // 使用空字符串，这样所有请求都会使用相对路径
   // 在生产环境中，请求会通过Nginx代理到backend
   // 在开发环境中，可以通过环境变量配置完整URL
-  // Use an empty string so all requests use relative paths.
-  // In a production environment, requests are proxied to the backend through Nginx.
-  // In a development environment, you can configure the full URL via environment variables.
   private baseURL = import.meta.env.PUBLIC_API_URL || '';
 
   /**

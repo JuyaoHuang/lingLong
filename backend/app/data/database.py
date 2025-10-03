@@ -11,6 +11,10 @@ from typing import Generator
 
 from ..core.config import settings
 
+# 创建数据库引擎
+# SQLite 不需要连接池，但为了兼容性保留 pool_pre_ping
+# Create the database engine
+# SQLite does not require a connection pool, but pool_pre_ping is retained for compatibility.
 engine = create_engine(
     settings.DATABASE_URL,
     connect_args={"check_same_thread": False},  # SQLite-specific configuration
@@ -24,6 +28,8 @@ engine = create_engine(
 # autoflush=False: Disable automatic flushing to improve performance
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# 创建模型基类
+# Create a base model class
 Base = declarative_base()
 
 
@@ -40,7 +46,7 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
     finally:
-        db.close()  
+        db.close()  # 确保会话关闭，避免连接泄漏
 
 
 def create_tables():
