@@ -80,8 +80,8 @@ const { title, description = "Blog Admin Panel" } = Astro.props;
         <div class="flex items-center space-x-4">
           <h1 class="text-xl font-bold text-gray-900">Blog Admin</h1>
           <nav class="hidden md:flex space-x-4">
-            <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-            <a href="/admin/editor/new" class="text-gray-600 hover:text-gray-900">New Post</a>
+            <a href="/atri/dashboard" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+            <a href="/atri/editor/new" class="text-gray-600 hover:text-gray-900">New Post</a>
           </nav>
         </div>
 
@@ -110,7 +110,7 @@ const { title, description = "Blog Admin Panel" } = Astro.props;
         if (logoutBtn) {
           logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('admin_token');
-            window.location.href = '/admin/login';
+            window.location.href = '/atri/login';
           });
         }
       });

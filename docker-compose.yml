@@ -20,6 +20,8 @@ services:
       - ENVIRONMENT=production           # 环境标识
       - ASTRO_CONTENT_PATH=/code/lingLong/src/contents/posts
       - ASTRO_PROJECT_PATH=/code/lingLong
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}  # 从 .env 文件读取（PASSWORD不提交到 Git）
+      - SECRET_KEY=${SECRET_KEY}         # JWT 密钥
     # 注意：不对外暴露端口，只通过nginx访问
 
   nginx:

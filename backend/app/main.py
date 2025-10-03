@@ -10,21 +10,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings, ALLOWED_ORIGINS
 from .data.database import create_tables
 from .api import auth, posts
+from .core.init_admin import init_admin_user
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     应用程序生命周期管理 - Application lifespan management
 
-    启动时：创建数据库表
+    启动时：创建数据库表并初始化管理员用户
     关闭时：清理资源（如需要）
 
-    Startup: Create database tables
+    Startup: Create database tables and initialize admin user
     Shutdown: Cleanup resources (if needed)
     """
     # 启动时执行 - Execute on startup
     create_tables()
     print("Database tables created/verified")
+
+    # 初始化管理员用户
+    print("Initializing admin user...")
+    init_admin_user()
+
     print(f"API Documentation available at: http://localhost:8000/docs")
     print(f"Authentication endpoint: POST /token")
     print(f"Admin posts endpoint: {settings.API_PREFIX}/admin/posts")

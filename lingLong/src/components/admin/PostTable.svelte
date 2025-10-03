@@ -61,7 +61,7 @@
   }
 
   function handleEdit(slug) {
-    window.location.href = `/admin/editor/${slug}`;
+    window.location.href = `/atri/editor/${slug}`;
   }
 
   function handleDelete(post) {

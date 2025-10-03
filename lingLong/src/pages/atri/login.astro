@@ -179,7 +179,7 @@
   <script>
     // Check if already logged in
     if (localStorage.getItem('admin_token')) {
-      window.location.href = '/admin/dashboard';
+      window.location.href = '/atri/dashboard';
     }
 
     const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
@@ -245,7 +245,7 @@
           if (response.ok) {
             const data = await response.json();
             localStorage.setItem('admin_token', data.access_token);
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/atri/dashboard';
           } else {
             showError('Invalid username or password');
           }
