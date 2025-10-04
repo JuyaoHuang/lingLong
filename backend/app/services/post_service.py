@@ -42,8 +42,8 @@ def get_all_posts_metadata() -> List[Dict[str, Any]]:
             with open(md_file, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
 
-            # 提取slug（文件名，不包含扩展名） - Extract slug (filename without extension)
-            slug = md_file.stem
+            # 提取slug（文件名，不包含扩展名，转小写以匹配Astro路由） - Extract slug (filename without extension, lowercase to match Astro routes)
+            slug = md_file.stem.lower()
 
             # Build metadata dictionary with proper date conversion
             metadata = {
@@ -102,10 +102,16 @@ def get_post_by_slug(slug: str) -> Optional[Dict[str, Any]]:
         - All frontmatter fields
     """
     posts_dir = Path(settings.ASTRO_CONTENT_PATH)
-    md_file = posts_dir / f"{slug}.md"
+
+    # 由于slug是小写的，需要遍历查找匹配的文件 - Since slug is lowercase, need to iterate to find matching file
+    md_file = None
+    for file in posts_dir.glob("*.md"):
+        if file.stem.lower() == slug.lower():
+            md_file = file
+            break
 
     # 检查文件是否存在--Check if file exists
-    if not md_file.exists():
+    if not md_file or not md_file.exists():
         return None
 
     try:
@@ -178,8 +184,8 @@ def create_post(post_data: Dict[str, Any]) -> bool:
         # 生成 slug（使用标题作为文件名，替换特殊字符）--Generate slug (use title as filename, replace special characters)
         slug = _generate_slug(title)
 
-        # 准备前言数据--Prepare frontmatter data
-        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content'}
+        # 准备前言数据,过滤掉 None 值以避免 Zod 校验错误--Prepare frontmatter data, filter out None values to avoid Zod validation errors
+        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content' and v is not None}
 
         # 确保发布日期存在且格式正确--Ensure publication date exists and is properly formatted
         if 'published' not in frontmatter_data:
@@ -202,15 +208,21 @@ def create_post(post_data: Dict[str, Any]) -> bool:
         posts_dir = Path(settings.ASTRO_CONTENT_PATH)
         posts_dir.mkdir(parents=True, exist_ok=True)
 
+        # 文件名使用原始slug（可能包含大写），但API返回的slug是小写的
+        # Filename uses original slug (may contain uppercase), but API returns lowercase slug
         md_file = posts_dir / f"{slug}.md"
 
         with open(md_file, 'w', encoding='utf-8') as f:
             f.write(frontmatter.dumps(post))
+            f.flush()  # 强制刷新缓冲区
+            os.fsync(f.fileno())  # 确保写入磁盘
 
         print(f"Article created successfully: {md_file}")
 
         # 根据环境决定是否触发 Astro rebuild
         if settings.ENVIRONMENT == "production":
+            import time
+            time.sleep(2)  # 等待2秒确保文件系统完全同步
             trigger_astro_rebuild()
         else:
             print("Development mode: Astro dev server will auto-detect file changes")
@@ -243,15 +255,22 @@ def update_post(slug: str, post_data: Dict[str, Any]) -> bool:
     """
     try:
         posts_dir = Path(settings.ASTRO_CONTENT_PATH)
-        md_file = posts_dir / f"{slug}.md"
 
-        if not md_file.exists():
+        # 由于slug是小写的，需要遍历查找匹配的文件 - Since slug is lowercase, need to iterate to find matching file
+        md_file = None
+        for file in posts_dir.glob("*.md"):
+            if file.stem.lower() == slug.lower():
+                md_file = file
+                break
+
+        if not md_file or not md_file.exists():
             print(f"Error: Article {slug} does not exist")
             return False
 
         # 提取内容--Extract content
         content = post_data.get('content', '').strip()
-        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content'}
+        # 过滤掉 None 值以避免 Zod 校验错误--Filter out None values to avoid Zod validation errors
+        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content' and v is not None}
 
         # 处理前置内容的日期转换--Handle date conversion for frontmatter
         if 'published' in frontmatter_data:
@@ -271,10 +290,14 @@ def update_post(slug: str, post_data: Dict[str, Any]) -> bool:
 
         with open(md_file, 'w', encoding='utf-8') as f:
             f.write(frontmatter.dumps(post))
+            f.flush()  # 强制刷新缓冲区
+            os.fsync(f.fileno())  # 确保写入磁盘
 
         print(f"Article updated successfully: {md_file}")
 
         if settings.ENVIRONMENT == "production":
+            import time
+            time.sleep(2)  # 等待2秒确保文件系统完全同步
             trigger_astro_rebuild()
         else:
             print("Development mode: Astro dev server will auto-detect file changes")
@@ -305,16 +328,31 @@ def delete_post(slug: str) -> bool:
     """
     try:
         posts_dir = Path(settings.ASTRO_CONTENT_PATH)
-        md_file = posts_dir / f"{slug}.md"
 
-        if not md_file.exists():
+        # 由于slug是小写的，需要遍历查找匹配的文件 - Since slug is lowercase, need to iterate to find matching file
+        md_file = None
+        for file in posts_dir.glob("*.md"):
+            if file.stem.lower() == slug.lower():
+                md_file = file
+                break
+
+        if not md_file or not md_file.exists():
             print(f"Error: Article {slug} does not exist")
             return False
 
         os.remove(md_file)
         print(f"Article deleted successfully: {md_file}")
 
+        # 同时删除 dist 中对应的文章目录 - Also delete corresponding article directory in dist
+        dist_posts_dir = Path(settings.ASTRO_PROJECT_PATH) / "dist" / "posts" / slug
+        if dist_posts_dir.exists():
+            import shutil
+            shutil.rmtree(dist_posts_dir)
+            print(f"Deleted dist directory: {dist_posts_dir}")
+
         if settings.ENVIRONMENT == "production":
+            import time
+            time.sleep(1)  # 等待文件系统同步 - Wait for filesystem sync
             trigger_astro_rebuild()
         else:
             print("Development mode: Astro dev server will auto-detect file changes")
@@ -328,16 +366,16 @@ def delete_post(slug: str) -> bool:
 
 def trigger_astro_rebuild():
     """
-    触发 Astro 项目重建
+    触发 Astro 项目重建（异步后台执行）
 
     注意：
-    在 Astro 项目目录中执行 pnpm run build 命令
-    这是使文章更改生效的关键步骤
-    Trigger Astro project rebuild
+    在 Astro 项目目录中异步执行 pnpm run build 命令
+    使用后台进程避免阻塞 API 请求，防止构建期间网站崩溃
+    Trigger Astro project rebuild (async background execution)
 
     Note:
-        Execute pnpm run build command in Astro project directory
-        This is the key step to make article changes take effect
+        Execute pnpm run build command asynchronously in background
+        Uses background process to avoid blocking API requests and website crashes during build
     """
     try:
         astro_project_path = Path(settings.ASTRO_PROJECT_PATH)
@@ -346,29 +384,26 @@ def trigger_astro_rebuild():
             print(f"Error: Astro project directory does not exist: {astro_project_path}")
             return False
 
-        print(f"Starting Astro project rebuild: {astro_project_path}")
+        print(f"Starting Astro project rebuild in background: {astro_project_path}")
 
-        # 执行构建命令--Execute build command
-        result = subprocess.run(
-            ["pnpm", "run", "build"],
-            cwd=astro_project_path,
-            capture_output=True,
-            text=True,
-            timeout=300  # 5 minute timeout
-        )
+        # 创建日志文件 - Create log file
+        log_file = astro_project_path / "build.log"
 
-        if result.returncode == 0:
-            print("Astro project build successful")
-            print("Build output:", result.stdout)
-            return True
-        else:
-            print("Astro project build failed")
-            print("Error output:", result.stderr)
-            return False
+        # 异步后台执行构建命令，记录日志 - Execute build command in background with logging
+        with open(log_file, 'w') as f:
+            subprocess.Popen(
+                ["pnpm", "run", "build"],
+                cwd=astro_project_path,
+                stdout=f,
+                stderr=subprocess.STDOUT,  # 错误也输出到同一个文件
+                start_new_session=True  # 完全独立的进程组，不受父进程影响
+            )
 
-    except subprocess.TimeoutExpired:
-        print("Error: Build timeout (exceeded 5 minutes)")
-        return False
+        print(f"Astro build started in background (will take ~6 minutes on Raspberry Pi)")
+        print(f"Build log: {log_file}")
+        print("Website will continue serving old version until build completes")
+        return True
+
     except Exception as e:
         print(f"Error triggering build: {e}")
         return False
@@ -410,5 +445,8 @@ def _generate_slug(title: str) -> str:
 
     # 删除前导连字符和尾随连字符--Remove leading and trailing hyphens
     slug = slug.strip('-')
+
+    # 转换为小写以匹配 Astro 的静态路由生成规则--Convert to lowercase to match Astro's static route generation
+    slug = slug.lower()
 
     return slug or 'untitled'

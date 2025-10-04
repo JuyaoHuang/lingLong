@@ -5,8 +5,8 @@ FROM python:3.11-slim-bookworm
 
 USER root
 
-# 安装必要的系统依赖
-RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
+# 安装必要的系统依赖（包括 gosu 用于权限切换）
+RUN apt-get update && apt-get install -y curl git gosu && rm -rf /var/lib/apt/lists/*
 
 # 安装 Node.js----后端运行pnpm build脚本需要
 ENV NODE_VERSION=22
@@ -15,6 +15,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
 
 # 配置 npm 镜像源并安装 pnpm
 RUN npm config set registry https://registry.npmmirror.com && npm install -g pnpm
+
+# 配置 pnpm 镜像源
+RUN pnpm config set registry https://registry.npmmirror.com
 
 # 设置工作目录
 WORKDIR /code
@@ -37,8 +40,21 @@ COPY lingLong/pnpm-lock.yaml /code/lingLong/pnpm-lock.yaml
 # 在构建时安装前端依赖
 RUN cd /code/lingLong && pnpm install --frozen-lockfile
 
+# 创建非root用户运行应用
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /code
+
+# 复制启动脚本
+COPY backend/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# 注意：不在这里切换USER，而是在entrypoint中切换
+
 # 暴露端口
 EXPOSE 8000
+
+# 使用启动脚本作为入口点
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # 启动命令
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
