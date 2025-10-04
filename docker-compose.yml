@@ -22,6 +22,13 @@ services:
       - ASTRO_PROJECT_PATH=/code/lingLong
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}  # 从 .env 文件读取（PASSWORD不提交到 Git）
       - SECRET_KEY=${SECRET_KEY}         # JWT 密钥
+    # 资源限制：适配树莓派4 (2GB内存)
+    deploy:
+      resources:
+        limits:
+          memory: 1G      # 后端最大占用1G内存
+        reservations:
+          memory: 512M    # 预留512M内存
     # 注意：不对外暴露端口，只通过nginx访问
 
   nginx:
@@ -29,11 +36,18 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     container_name: sim_nginx
-    # 端口映射：PC的8080端口 → 容器的80端口
+    # 端口映射：主机的8090端口 → 容器的80端口
     ports:
-      - "8080:80"
+      - "8090:80"
     volumes:
       - ./lingLong/dist:/usr/share/nginx/html
+    # 资源限制：适配树莓派4 (2GB内存)
+    deploy:
+      resources:
+        limits:
+          memory: 256M    # Nginx最大占用256M内存
+        reservations:
+          memory: 128M    # 预留128M内存
     # 依赖关系：等待backend启动后再启动nginx
     depends_on:
       - backend

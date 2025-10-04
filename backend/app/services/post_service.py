@@ -178,8 +178,8 @@ def create_post(post_data: Dict[str, Any]) -> bool:
         # 生成 slug（使用标题作为文件名，替换特殊字符）--Generate slug (use title as filename, replace special characters)
         slug = _generate_slug(title)
 
-        # 准备前言数据--Prepare frontmatter data
-        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content'}
+        # 准备前言数据,过滤掉 None 值以避免 Zod 校验错误--Prepare frontmatter data, filter out None values to avoid Zod validation errors
+        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content' and v is not None}
 
         # 确保发布日期存在且格式正确--Ensure publication date exists and is properly formatted
         if 'published' not in frontmatter_data:
@@ -251,7 +251,8 @@ def update_post(slug: str, post_data: Dict[str, Any]) -> bool:
 
         # 提取内容--Extract content
         content = post_data.get('content', '').strip()
-        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content'}
+        # 过滤掉 None 值以避免 Zod 校验错误--Filter out None values to avoid Zod validation errors
+        frontmatter_data = {k: v for k, v in post_data.items() if k != 'content' and v is not None}
 
         # 处理前置内容的日期转换--Handle date conversion for frontmatter
         if 'published' in frontmatter_data:
