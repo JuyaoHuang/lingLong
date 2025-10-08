@@ -11,8 +11,8 @@ services:
     ports:
       - "8090:80"
     volumes:
-      # 注意：在树莓派上路径应为 ~/blog/code/lingLong/dist
-      - ./lingLong/dist:/usr/share/nginx/html:ro
+      # 树莓派路径：~/blog/code/lingLong/dist
+      - ./code/lingLong/dist:/usr/share/nginx/html:ro
     # 资源限制：适配树莓派4 (2GB内存)
     deploy:
       resources:

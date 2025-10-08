@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# 自动化部署脚本
-# 用途：从 GitHub 拉取最新代码并重新构建前端
+# 自动化部署脚本 (双仓库架构)
+# 用途：从 GitHub 拉取代码和内容，重新构建前端
 # ============================================
 
 set -e  # 遇到错误立即退出
@@ -10,7 +10,10 @@ set -e  # 遇到错误立即退出
 # 配置变量
 PROJECT_DIR="$(dirname "$(realpath "$0")")"
 LOG_FILE="$PROJECT_DIR/deploy.log"
-BRANCH="master"
+CODE_BRANCH="dev"           # 代码仓库分支
+CONTENT_BRANCH="master"     # 内容仓库分支
+CODE_DIR="$PROJECT_DIR/code/lingLong"
+CONTENT_DIR="$PROJECT_DIR/contents"
 
 # 日志函数
 log() {
@@ -21,32 +24,32 @@ log "=========================================="
 log "开始自动化部署流程"
 log "=========================================="
 
-# 进入项目目录
-cd "$PROJECT_DIR" || { log "错误：无法进入项目目录 $PROJECT_DIR"; exit 1; }
-log "当前目录: $(pwd)"
+# 1. 拉取内容仓库
+log ">>> [1/4] 拉取内容仓库..."
+cd "$CONTENT_DIR" || { log "错误：无法进入内容目录 $CONTENT_DIR"; exit 1; }
+git fetch origin "$CONTENT_BRANCH"
+git reset --hard "origin/$CONTENT_BRANCH"
+log "内容仓库更新完成"
 
-# 拉取最新代码
-log "正在从 GitHub 拉取最新代码..."
-git fetch origin "$BRANCH"
-git reset --hard "origin/$BRANCH"
-log "代码拉取完成"
+# 2. 拉取代码仓库
+log ">>> [2/4] 拉取代码仓库..."
+cd "$CODE_DIR" || { log "错误：无法进入代码目录 $CODE_DIR"; exit 1; }
+git fetch origin "$CODE_BRANCH"
+git reset --hard "origin/$CODE_BRANCH"
+log "代码仓库更新完成"
 
-# 进入前端目录
-cd lingLong || { log "错误：无法进入 lingLong 目录"; exit 1; }
-
-# 安装依赖（如果 package.json 有更新）
-log "检查并安装依赖..."
+# 3. 安装依赖并构建
+log ">>> [3/4] 检查并安装依赖..."
 pnpm install --frozen-lockfile
 log "依赖安装完成"
 
-# 构建前端
 log "开始构建前端..."
 pnpm build
 log "前端构建完成"
 
-# 重启 Nginx 容器以加载新的静态文件
+# 4. 重启 Nginx 容器
 cd "$PROJECT_DIR"
-log "重启 Nginx 容器..."
+log ">>> [4/4] 重启 Nginx 容器..."
 docker compose restart nginx
 log "Nginx 重启完成"
 

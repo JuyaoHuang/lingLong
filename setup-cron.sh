@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # ============================================
-# Cron 定时任务设置脚本
-# 用途：为 deploy.sh 创建一个定时执行任务
+# Cron 定时任务设置脚本 (双仓库架构)
+# 用途：为 deploy.sh 创建定时任务 (每6小时)
+# 部署路径：~/blog/
 # ============================================
 
 set -e # 遇到错误立即退出
@@ -32,9 +33,9 @@ if [ ! -x "$SCRIPT_PATH" ]; then
 fi
 
 # 构造完整的 Cron 命令
-# 注意：我们需要确保脚本在正确的环境下运行，所以最好在命令前加上 'cd'
+# 重定向日志输出到 deploy.log
 PROJECT_DIR=$(dirname "$SCRIPT_PATH")
-CRON_COMMAND="cd $PROJECT_DIR && $SCRIPT_PATH"
+CRON_COMMAND="cd $PROJECT_DIR && $SCRIPT_PATH >> $PROJECT_DIR/deploy.log 2>&1"
 CRON_JOB="$CRON_SCHEDULE $CRON_COMMAND"
 
 echo ">>> 将要设置的 Cron 任务: $CRON_JOB"
