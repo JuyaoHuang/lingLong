@@ -175,6 +175,7 @@ backend/app/services/__pycache__/
 
 # ======================== Global Configuration ============================
 .env
+deploy.log
 命名架构修改方案.md
 DockerHub推送问题.md
 you.md
