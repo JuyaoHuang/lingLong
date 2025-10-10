@@ -42,7 +42,7 @@ const tagKeys = [...tags.keys()];
       <div class="username mt-4">
         <p>{LingLongConfig.username}</p>
       </div>
-      <p class="slogan mt-2 text-center text-[var(--text-color-lighten)]">
+      <p class="sign slogan mt-2 text-center text-[var(--text-color-lighten)]">
         {LingLongConfig.sign}
       </p>
       <!-- 遍历配置文件中的 socialLinks 数组
@@ -159,6 +159,17 @@ const tagKeys = [...tags.keys()];
     }
   </div>
 </div>
+
+      <!-- background-image: linear-gradient(
+    to right,       /* 渐变方向：从左到右 */
+    #ef4444,       /* Red-500 */
+    #f97316,       /* Orange-500 */
+    #eab308,       /* Yellow-500 */
+    #22c55e,       /* Green-500 */
+    #3b82f6,       /* Blue-500 */
+    #6366f1,       /* Indigo-500 */
+    #8b5cf6        /*Violet-500*/
+  ); -->
 <style>
   .avatar-wrapper::after {
     @apply absolute left-3 top-3 h-56 w-56 rounded-xl transition-all content-[''];
@@ -173,10 +184,19 @@ const tagKeys = [...tags.keys()];
   }
 
   .username > p {
-    @apply text-center text-xl font-semibold text-[var(--text-color)];
+    @apply text-center text-xl font-semibold text-transparent
+          bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
+           bg-clip-text;
     font-family: var(--title-font);
+
   }
 
+  .sign{
+        @apply text-center text-transparent
+          bg-gradient-to-r  from-cyan-400 via-blue-500 to-indigo-600  
+          bg-clip-text;
+    font-family: var(--title-font);                       
+  }
   .username > div {
     @apply mx-auto mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)];
   }

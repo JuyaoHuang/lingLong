@@ -11,8 +11,9 @@ services:
     ports:
       - "8090:80"
     volumes:
-      # 树莓派路径：~/blog/code/lingLong/dist
-      - ./code/lingLong/dist:/usr/share/nginx/html:ro
+      # docker-compose.yml 在 ~/blog/code/ 目录下
+      # 相对路径从此目录开始计算
+      - ./lingLong/dist:/usr/share/nginx/html:ro
     # 资源限制：适配树莓派4 (2GB内存)
     deploy:
       resources:

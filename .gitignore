@@ -181,3 +181,6 @@ DockerHub推送问题.md
 you.md
 .claude
 DEPLOYMENT_CHECKLIST.md
+deploy.sh
+setup-cron.sh
+README_zh.md

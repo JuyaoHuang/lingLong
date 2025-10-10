@@ -4,11 +4,11 @@ import type { Configuration } from "./src/types/config";
 const LingLongConfig: Configuration = {
   title: "",
   subTitle: "",
-  brandTitle: "Alen's website",
+  brandTitle: "Atri site",
 
   description: "",
 
-  site: "https://linglong-blog.top",// 网站 URL
+  site: "https://juayohuang.top",// 网站 URL
 
   locale: "en", // set for website language and date format
   // 页面 URL 配置
@@ -36,7 +36,7 @@ const LingLongConfig: Configuration = {
   ],
   username: "わかば むつみ",
   sign: "とある科学のみさか みこと",
-  avatarUrl:"/muzimi.png",
+  avatarUrl:"/Atri.png",
   socialLinks: [
     {
       icon: "line-md:github-loop",
@@ -60,17 +60,36 @@ const LingLongConfig: Configuration = {
 
   banners: [
     "/images/1.png",
-    "/images/2.jpg",
+    // "/images/2.png",
     "/images/3.png",
     "/images/4.png",
     "/images/5.jpg",
     "/images/6.jpg",
-    "/images/7.png",
-    "/images/8.png",
+    // "/images/7.png",
+    "/images/8.jpg",
     "/images/9.png",
     "/images/10.jpg",
-    "/images/11.jpg",
-    "/images/12.png",
+    "/images/11.png",
+    "/images/13.png",
+    "/images/14.png",
+    "/images/15.png",
+    "/images/16.jpg",
+    "/images/17.jpg",
+    "/images/18.png",
+    // 卡提西亚
+    // "/images/kati/20.jpg",
+    // "/images/kati/21.jpg",
+    // "/images/kati/22.jpg",
+    // "/images/kati/23.jpg",
+    // "/images/kati/24.jpg",
+    // "/images/kati/25.jpg",
+    // "/images/kati/26.jpg",
+    // "/images/kati/27.jpg",
+    // "/images/kati/28.jpg",
+    // "/images/kati/29.jpg",
+    // "/images/kati/30.jpg",
+    // "/images/kati/31.jpg",
+    // 卡提end
   ],
   
   slugMode: "RAW", // 'RAW' | 'HASH' - 切换到RAW模式，URL直接使用分类名

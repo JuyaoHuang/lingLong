@@ -48,13 +48,13 @@ const tagKeys = [...tags.keys()];
         <div class="flex flex-col items-center">
           <a
             href="/about"
-            class="line-clamp-1 text-xl font-semibold text-[var(--text-color)]"
+            class="username line-clamp-1 text-xl font-semibold text-[var(--text-color)]"
           >
             {LingLongConfig.username}
           </a>
           <span class="mb-2 mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)]"
           ></span>
-          <p class="line-clamp-1 text-[var(--text-color-lighten)]">
+          <p class="sign line-clamp-1 text-[var(--text-color-lighten)]">
             {LingLongConfig.sign}
           </p>
         </div>
@@ -213,5 +213,19 @@ const tagKeys = [...tags.keys()];
 
   .category:hover > p {
     @apply pl-2 text-[var(--primary-color)];
+  }
+
+  .username{
+    @apply text-center text-xl font-semibold text-transparent
+           bg-[linear-gradient(to_right,theme(colors.red.500),theme(colors.orange.500),theme(colors.yellow.500),theme(colors.green.500),theme(colors.blue.500),theme(colors.indigo.500),theme(colors.violet.500))]
+           bg-clip-text
+           ;
+    font-family: var(--title-font);
+  }
+
+  .sign{
+    @apply text-center text-xl font-semibold text-transparent
+           bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500;
+           ;
   }
 </style>
