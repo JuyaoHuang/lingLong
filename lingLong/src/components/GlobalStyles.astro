@@ -60,11 +60,11 @@ import "overlayscrollbars/overlayscrollbars.css";
     left: 0.5rem;
     width: 280px;
     max-height: 60vh;
-    background: #ddede3;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    backdrop-filter: blur(4px);
+    border: none;
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     z-index: 9999 !important;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -73,27 +73,27 @@ import "overlayscrollbars/overlayscrollbars.css";
   }
 
   /* 深色模式支持 */
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     .floating-toc {
       background: rgba(30, 30, 30, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
-  }
+  } */
 
   /* TOC标题部分 */
   .toc-header {
     padding: 1rem 1.25rem 0.75rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--primary-color-transparent);
+    background: var(--primary-color-transparent); 
   }
 
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     .toc-header {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.02);
     }
-  }
+  } */
 
   .toc-header h3 {
     margin: 0;
@@ -120,7 +120,7 @@ import "overlayscrollbars/overlayscrollbars.css";
   }
 
   .toc-content::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(191, 143, 233, 0.2);
     border-radius: 2px;
   }
 
@@ -157,32 +157,32 @@ import "overlayscrollbars/overlayscrollbars.css";
 
   /* 悬停效果 */
   .toc-link:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--primary-color-transparent);
     color: var(--primary-color, #0066cc);
   }
 
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     .toc-link:hover {
       background: rgba(255, 255, 255, 0.05);
       color: var(--primary-color, #66aaff);
     }
-  }
+  } */
 
   /* 激活状态样式 */
   .toc-link.active {
-    background: rgba(0, 102, 204, 0.1);
+    background: var(--primary-color-transparent);
     color: var(--primary-color, #0066cc);
     border-left-color: var(--primary-color, #0066cc);
     font-weight: 500;
   }
-
+/* 
   @media (prefers-color-scheme: dark) {
     .toc-link.active {
       background: rgba(102, 170, 255, 0.1);
       color: var(--primary-color, #66aaff);
       border-left-color: var(--primary-color, #66aaff);
     }
-  }
+  } */
 
   /* 响应式设计：中等屏幕隐藏 */
   @media (max-width: 1200px) {

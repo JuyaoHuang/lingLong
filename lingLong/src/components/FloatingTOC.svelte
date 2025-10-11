@@ -115,7 +115,7 @@
     max-height: 60vh;
     /* background: rgba(215,222,206,0.6);
      */
-    background: #ddede3;
+    background: #e8dded;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
