@@ -35,7 +35,7 @@ const LingLongConfig: Configuration = {
     },
   ],
   username: "わかば むつみ",
-  sign: "私の唯一の命は私にかかっている",///我这仅此一次的人生只取决我
+  sign: "私の唯一の命は私にかかっている",//我这仅此一次的人生只取决我 私の唯一の命は私にかかっている
   avatarUrl:"/Atri.png",
   socialLinks: [
     {
