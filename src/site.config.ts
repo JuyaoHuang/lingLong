@@ -157,7 +157,7 @@ export const integ: IntegrationUserConfig = {
     blockquoteStyle: 'italic',
     // The style of inline code block `code` / `modern` (default to code in typography)
     // 行内代码样式: 'code' / 'modern'
-    inlineCodeBlockStyle: 'code'
+    inlineCodeBlockStyle: 'modern'
   },
   // [Lightbox]
   // A lightbox library that can add zoom effect
