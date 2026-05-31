@@ -144,6 +144,11 @@ span.katex-display {
     top: 0.75rem;
     right: 0;
   }
+  @media (max-width: 640px) {
+    & .language {
+      display: none;
+    }
+  }
 
   /* Copy */
   & button.copy {
