@@ -4,6 +4,8 @@ import { cn } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { getFirstCategories } from '@/utils/categories'
 
+export const prerender = true
+
 const categoriesMap = await getFirstCategories()
 const allCategories = [...categoriesMap.values()].map(category => ({
   name: category.name,

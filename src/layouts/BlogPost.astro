@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content'
 
 // Plugin styles
 import 'katex/dist/katex.min.css'
-import 'lxgw-wenkai-screen-webfont/style.css'
+import lxgwWenkaiCssUrl from 'lxgw-wenkai-screen-webfont/style.css?url'
 
 import { MediumZoom } from 'astro-pure/advanced'
 import { ArticleBottom, Copyright, Hero, TOC } from 'astro-pure/components/pages'
@@ -51,6 +51,10 @@ const isPoetrySharePost = data.first_level_category === '诗词分享'
   highlightColor={primaryColor}
   back='/blog'
 >
+  <Fragment slot='head'>
+    {isPoetrySharePost && <link rel='stylesheet' href={lxgwWenkaiCssUrl} />}
+  </Fragment>
+
   {!!headings.length && <TOC {headings} slot='sidebar' />}
 
   <Hero {data} {remarkPluginFrontmatter} slot='header'>

@@ -25,6 +25,7 @@ const {
   <head>
     <BaseHead {articleDate} {description} {ogImage} {title} />
     <ThemeProvider />
+    <slot name='head' />
   </head>
 
   <body class='flex justify-center bg-background text-foreground' {...props}>
