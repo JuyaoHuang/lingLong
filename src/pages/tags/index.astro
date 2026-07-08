@@ -4,6 +4,8 @@ import { Button } from 'astro-pure/user'
 import { cn } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 
+export const prerender = true
+
 const allPosts = await getBlogCollection()
 const allTags = getUniqueTagsWithCount(allPosts)
 
