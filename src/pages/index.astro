@@ -41,7 +41,7 @@ if (!images[imagePath])
 ---
 
 <PageLayout meta={{ title: 'Home' }} highlightColor={backgroundMode === 'gradient' ? '#ad86ed' : undefined}>
-  {
+  <!-- {
     backgroundMode === 'image' && (
       <div class='homepage-bg pointer-events-none absolute start-0 top-0 z-0 h-screen w-full overflow-hidden'>
         <Image
@@ -58,7 +58,7 @@ if (!images[imagePath])
         />
       </div>
     )
-  }
+  } -->
   <WeatherWidget />
   <main class='flex w-full flex-col items-center'>
     <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
@@ -107,15 +107,15 @@ if (!images[imagePath])
       <Section title='About'>
       <p>Developer / AI Engineer</p>
       <p>
-        一名热爱编程的<span class="line-through text-muted-foreground">全栈开发者</span>，目前正在向 AI 应用开发方向发展。
+        I'm learning modern enterprise backend design patterns through Java.
       </p>
       <p>
-        现在正在学习 Java ，期望系统性了解后端开发的相关知识，扩展自己的深度。
+        What I interesting in is AI, especially in Agent building and speech synthesis.
       </p>
       <p>
-        我的兴趣主要在 NLP / 语音克隆 方向。
+        I like Minecraft.
       </p>
-        <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
+      <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
       </Section>
       {
         allPostsByDate.length > 0 && (
@@ -161,7 +161,7 @@ if (!images[imagePath])
       />
     </Section> */
       }
-      <Section title='Education'>
+      <!-- <Section title='Education'>
         <Card
           as='a'
           heading='北京邮电大学'
@@ -189,7 +189,7 @@ if (!images[imagePath])
         >
          <Image src={NnsImg} alt="nnsz" class="absolute end-0 z-0 m-0 -my-3 h-full w-1/2 object-cover opacity-40" />
         </Card>
-      </Section>
+      </Section> -->
 
       <!-- <Section title='Website List'>
         <div class='grid grid-cols-1 gap-3 sm:grid-cols-2'>
@@ -230,12 +230,12 @@ if (!images[imagePath])
         />
       </Section> -->
 
-      <Section title='Skills'>
+      <!-- <Section title='Skills'>
         <SkillLayout title='Programming' skills={programming} />
         <SkillLayout title='Tools' skills={tools} />
         <SkillLayout title='Web' skills={Web} />
         <SkillLayout title='Others' skills={others} />
-      </Section>
+      </Section> -->
     </div>
     <Quote class='mt-12' />
   </main>

@@ -10,13 +10,13 @@ const headings = [
   { depth: 2, slug: 'tools', text: 'Tools' },
   { depth: 2, slug: 'social-networks', text: 'Social Networks' },
   { depth: 2, slug: 'education', text: 'Education' },
-  { depth: 2, slug: 'about-blog', text: 'About Blog' }
+  // { depth: 2, slug: 'about-blog', text: 'About Blog' }
 ]
 ---
 
 <PageLayout title='About' {headings} comment>
   <p>Developer / AI Engineer</p>
-  <p>
+  <!-- <p>
     一名热爱编程的<span class="line-through text-muted-foreground">全栈开发者</span>，目前正在向 AI 应用开发方向发展。
   </p>
   <p>
@@ -24,6 +24,9 @@ const headings = [
   </p>
   <p>
     我的兴趣主要在 NLP / 语音克隆 方向。
+  </p> -->
+  <p>
+    Like Minecraft.
   </p>
   <div class="flex items-start gap-3 p-3 mt-4 rounded-lg bg-muted/30 border border-border/50">
     <span class="i-ri-lightbulb-flash-line text-xl text-yellow-500 mt-0.5 shrink-0"></span>
@@ -48,6 +51,12 @@ const headings = [
       title='AI & Backend'
       tools={[
         {
+          name: 'Java',
+          description: 'Programming Language',
+          href: 'https://www.java.com/',
+          icon: import('@/assets/tools/java.svg?raw')
+        },
+        {
           name: 'PyTorch',
           description: 'Deep Learning Framework',
           href: 'https://pytorch.org/',
@@ -68,6 +77,20 @@ const headings = [
       ]}
     />
 
+    <!-- Frontend -->
+    <ToolSection
+      class='mb-5'
+      title='Frontend'
+      tools={[
+        {
+          name: 'Vue.js',
+          description: 'Progressive Framework',
+          href: 'https://vuejs.org/',
+          icon: import('@/assets/tools/vue.svg?raw')
+        }
+      ]}
+    />
+    
     <!-- Embedded & Edge -->
     <ToolSection
       class='mb-5'
@@ -85,26 +108,12 @@ const headings = [
           href: 'https://www.raspberrypi.org/',
           icon: import('@/assets/tools/raspberrypi.svg?raw')
         },
-        {
-          name: 'Embedded AI',
-          description: '',
-          href: '#',
-          icon: import('@/assets/tools/tensorflow.svg?raw') 
-        }
-      ]}
-    />
-
-    <!-- Frontend -->
-    <ToolSection
-      class='mb-5'
-      title='Frontend'
-      tools={[
-        {
-          name: 'Vue.js',
-          description: 'Progressive Framework',
-          href: 'https://vuejs.org/',
-          icon: import('@/assets/tools/vue.svg?raw')
-        }
+        // {
+        //   name: 'Embedded AI',
+        //   description: '',
+        //   href: '#',
+        //   icon: import('@/assets/tools/tensorflow.svg?raw') 
+        // }
       ]}
     />
   </div>
@@ -122,7 +131,7 @@ const headings = [
 
   {/* tools */}
   <h2 id='tools'>Tools</h2>
-  <p>These are some tools that I am currently using:</p>
+  <p>Some tools using:</p>
   <ToolSection
     class='mb-5'
     title='Development'
@@ -133,18 +142,18 @@ const headings = [
         href: 'https://code.visualstudio.com/',
         icon: import('@/assets/tools/vscode.svg?raw')
       },
-      {
-        name: 'Pycharm',
-        description: 'IDE',
-        href: 'https://www.jetbrains.com/pycharm/',
-        icon: import('@/assets/tools/pycharm.svg?raw')
-      },
-      {
-        name: 'CLion',
-        description: 'IDE',
-        href: 'https://www.jetbrains.com/clion/',
-        icon: import('@/assets/tools/clion.svg?raw')
-      },
+      // {
+      //   name: 'Pycharm',
+      //   description: 'IDE',
+      //   href: 'https://www.jetbrains.com/pycharm/',
+      //   icon: import('@/assets/tools/pycharm.svg?raw')
+      // },
+      // {
+      //   name: 'CLion',
+      //   description: 'IDE',
+      //   href: 'https://www.jetbrains.com/clion/',
+      //   icon: import('@/assets/tools/clion.svg?raw')
+      // },
       {
         name: 'Claude Code',
         description: 'AI coding',
@@ -152,16 +161,16 @@ const headings = [
         icon: import('@/assets/tools/claude.svg?raw')
       },
       {
-        name: 'Gemini 3 Pro',
+        name: 'Gemini 3.1 Pro',
         description: 'AI coding',
         href: 'https://gemini.google.com/',
         icon: import('@/assets/tools/gemini.svg?raw')
       },
       {
-        name: 'Copilot',
+        name: 'Codex',
         description: 'AI coding',
-        href: 'https://github.com/features/copilot',
-        icon: import('@/assets/tools/copilot.svg?raw')
+        href: 'https://openai.com/codex',
+        icon: import('@/assets/tools/chatgpt.svg?raw')
       },
     ]}
   />
@@ -181,12 +190,12 @@ const headings = [
       //   href: 'https://www.mozilla.org/en-US/firefox',
       //   icon: import('@/assets/tools/firefox.svg?raw')
       // },
-      {
-        name: 'Notion',
-        description: 'Note Taking',
-        href: 'https://www.notion.so/',
-        icon: import('@/assets/tools/notion.svg?raw')
-      },
+      // {
+      //   name: 'Notion',
+      //   description: 'Note Taking',
+      //   href: 'https://www.notion.so/',
+      //   icon: import('@/assets/tools/notion.svg?raw')
+      // },
       {
         name: 'Typora',
         description: 'Markdown Editor',
@@ -199,12 +208,12 @@ const headings = [
     class='mb-5'
     title='Environment'
     tools={[
-      {
-        name: 'Linux',
-        description: 'Linux Kernel',
-        href: 'https://github.com/torvalds/linux',
-        icon: import('@/assets/tools/linux.svg?raw')
-      },
+      // {
+      //   name: 'Linux',
+      //   description: 'Linux Kernel',
+      //   href: 'https://github.com/torvalds/linux',
+      //   icon: import('@/assets/tools/linux.svg?raw')
+      // },
       {
         name: 'Ubuntu 24.04 LTS',
         description: 'Linux Distribution',
@@ -225,7 +234,7 @@ const headings = [
       }
     ]}
   />
-  <ToolSection
+  <!-- <ToolSection
     class='mb-5'
     title='Design'
     tools={[
@@ -253,12 +262,12 @@ const headings = [
       //   href: 'https://www.adobe.com/products/premiere',
       //   icon: import('@/assets/tools/premiere.svg?raw')
       // }
-    ]}
-  />
+    ]} -->
+  <!-- /> -->
   {/* social-networks */}
   <h2 id='social-networks'>Social Networks</h2>
   <p>
-    You can also find me on the following social networks and platforms:
+   Some social networks and platforms that can find me:
   </p>
   <Substats
     stats={[
@@ -308,9 +317,10 @@ const headings = [
         content: '<a href="https://nn3z.nnedu.com/" target="_blank"><strong>广西南宁市第三中学（青山校区）</strong></a>'
       }
     ]}
-  />
+  /> 
+  
   {/* about-blog */}
-  <h2 id='about-blog'>About Blog</h2>
+  <!-- <h2 id='about-blog'>About Blog</h2>
   <p>
     The website relies on the following excellent projects and services:
   </p>
@@ -330,7 +340,7 @@ const headings = [
     <li>
       粉丝数统计: <a href='https://github.com/spencerwooo/substats' target='_blank'>Substats</a>
     </li>
-  </ul>
+  </ul> -->
 </PageLayout>
 
 <style is:global>

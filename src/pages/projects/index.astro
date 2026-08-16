@@ -12,16 +12,17 @@ import wechat from '@/assets/wechat-qrcode.jpg'
 
 export const prerender = true
 
-const headings = [
-  { depth: 2, slug: 'programs', text: 'Programs' },
-  { depth: 2, slug: 'learnings', text: 'Learnings' },
-  { depth: 2, slug: 'others', text: 'Others' },
-  { depth: 2, slug: 'gpg-signature', text: 'GPG Signature' },
-  { depth: 2, slug: 'sponsorship', text: 'Sponsorship' }
-]
+// const headings = [
+//   { depth: 2, slug: 'programs', text: 'Programs' },
+//   { depth: 2, slug: 'curriculum', text: 'curriculum resources' },
+//   // { depth: 2, slug: 'others', text: 'Others' },
+//   { depth: 2, slug: 'gpg-signature', text: 'GPG Signature' },
+//   // { depth: 2, slug: 'sponsorship', text: 'Sponsorship' }
+// ]
 ---
 
-<PageLayout title='Projects' {headings} view>
+<!-- <PageLayout title='Projects' {headings} view> -->
+<PageLayout title='Projects' view>
   <!-- {/* About astro-pure */}
   <div class='not-prose flex justify-center'>
     <a
@@ -41,13 +42,13 @@ const headings = [
       loading='lazy'
     />
   </p> -->
-  <p>
+  <!-- <p>
     If you find my projects useful, you can buy me a coffee to say thanks! 
     Got a cool idea? Drop me a line—I'd love to chat about it.
-  </p>
-  <Button title='Checkout sponsorship' class='w-fit' href='#sponsorship'>
+  </p> -->
+  <!-- <Button title='Checkout sponsorship' class='w-fit' href='#sponsorship'>
     <Icon class='size-5' name='receive-money' slot='before' />
-  </Button>
+  </Button> -->
 
   <!-- <h2 id='programs'>Theme</h2>
   <ProjectSection
@@ -69,47 +70,46 @@ const headings = [
   <ProjectSection
     projects={[
       {
-        name: 'Smart Gaze',
-        description: 'RK3568 NPU-accelerated face recognition access control with Web management.',
-        links: [
-          { type: 'github', href: 'https://github.com/JuyaoHuang/SmartGaze' }
-          // {
-          //   type: 'release',
-          //   href: 'https://www.npmjs.com/package/rehype-autolink-headings-simple'
-          // }
-        ]
+        name: 'Open-LLM-Vtuber',
+        description:
+          'Talk to any LLM with tts, vad, and Live2d taking face running locally across platforms.',
+        links: [{ type: 'github', href: 'https://github.com/Open-LLM-VTuber/Open-LLM-VTuber' }]
       },
       {
-        name: 'LLM-vtuber',
+        name: 'Atri Vtuber',
         description:
-          '您的全平台、全离线 Live2D 桌面语音 AI 伴侣。',
-        links: [{ type: 'github', href: 'https://github.com/Open-LLM-VTuber/Open-LLM-VTuber' }]
+          '🧸 A virtual soul companion that can listen, talk, see, and remember you. ',
+        links: [{ type: 'github', href: 'https://github.com/JuyaoHuang/ATRI' }]
+      },
+      {
+        name: 'Smart Gaze',
+        description: 'RK3568 NPU-accelerated face recognition access control with Web management.',
+        links: [{ type: 'github', href: 'https://github.com/JuyaoHuang/SmartGaze' }]
       }
     ]}
   />
-
-  <h2 id='learnings'>Learnings</h2>
+  <h2 id='curriculum'>Curriculums</h2>
   <ProjectSection
     class='my-2'
     projects={[
       {
-        name: '深度学习框架 PyTorch',
+        name: 'PyTorch',
         description: 'Some notes and code about learning Deep Learning',
         links: [
-          { type: 'github', href: 'https://github.com/JuyaoHuang/blogs/tree/main/AI/pytorch' },
+          // { type: 'github', href: 'https://github.com/JuyaoHuang/blogs/tree/main/AI/pytorch' },
           { type: 'site', href: 'https://www.juyaohuang.com/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6' }
         ]
       },
       {
-        name: '深度学习实验',
+        name: 'Deep Learning Experiments',
         description: 'Neural Networks and Deep Learning Course Experiment Codes and Reports',
         links: [
-          { type: 'github', href: 'https://github.com/JuyaoHuang/BUPTDeepLearning' },
+          // { type: 'github', href: 'https://github.com/JuyaoHuang/BUPTDeepLearning' },
           { type: 'site', href: 'https://www.juyaohuang.com/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/deeplearning' }
         ]
       },
       {
-        name: '通信原理',
+        name: 'Communication Principle',
         description: 'Some notes and exercise about learning Communication Principle',
         links: [
           {
@@ -119,7 +119,7 @@ const headings = [
         ]
       },
       {
-        name: '计算机网络',
+        name: 'Computer Networks',
         description: 'Some notes and exercises about learning Computer Networks',
         links: [
           {
@@ -129,7 +129,7 @@ const headings = [
         ]
       },
       {
-        name: '微机原理',
+        name: 'Microcomputer Principles',
         description: 'Some notes and exercises about learning Microcomputer Principles',
         links: [
           {
@@ -139,7 +139,7 @@ const headings = [
         ]
       },
       {
-        name: '信息论',
+        name: 'Information Theory',
         description: 'Some notes and exercises about learning Information Theory',
         links: [
           {
@@ -169,21 +169,23 @@ const headings = [
 
   <h2 id='gpg-signature'>GPG Signature</h2>
   <p>
-    你可以通过检查 GPG 签名来验证我签名文件的真实性。我的 GPG 密钥是<code>C68857F173DCB742</code>，你可以在 openpgp 密钥服务器上找到它，或者从那里下载。
+    You can verify the authenticity of my signed files by checking the GPG signature. 
+
+    My GPG key is <u>C68857F173DCB742</u> , which you can find on the openpgp key server.
   </p>
   <Button href='https://keys.openpgp.org/search?q=114514' title='Checkout my key' target='_blank'>
     <KeyIcon class='size-5' slot='before' />
   </Button>
 
-  <h2 id='sponsorship'>Sponsorship</h2>
+  <!-- <h2 id='sponsorship'>Sponsorship</h2> -->
   <!-- <a href="https://afdian.com/a/cworld" target="_blank">Afadian</a>, -->
-  <p>Chinese methods: Wechat or Alipay </p>
+  <!-- <p>Chinese methods: Wechat or Alipay </p>
   <Sponsorship
     methods={[
       { name: 'WeChat', icon: 'wechat-pay', image: wechat },
       { name: 'Alipay', icon: 'alipay', image: alipay }
     ]}
-  />
+  /> -->
   <!-- <p>Global methods: <a href="https://ko-fi.com/cworld0" target="_blank">Ko-fi</a> </p> -->
   <!-- <p>Please leave a message or contact me proactively after sponsorship. My email is:
     <code style='cursor: pointer'

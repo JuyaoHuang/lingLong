@@ -81,12 +81,12 @@ export const theme: ThemeUserConfig = {
       //   title: 'Site Policy',
       //   link: '/terms',
       //   pos: 2 // position set to 2 will be appended to copyright line
-      // }
+      // github: 'https://github.com/JuyaoHuang/lingLong'}
     ],
     /** Enable displaying a “Astro & Pure theme powered” link in your site’s footer. */
-    credits: true,
+    credits: false,
     /** Optional details about the social media accounts for this site. */
-    social: { github: 'https://github.com/JuyaoHuang/lingLong' }
+    social: {}
   },
 
   // [Content]
@@ -102,7 +102,7 @@ export const theme: ThemeUserConfig = {
     /** Blog page size for pagination (optional) */
     blogPageSize: 8,
     // Currently support weibo, x, bluesky
-    share: ['weibo', 'x', 'bluesky']
+    // share: ['weibo', 'x', 'bluesky']
   }
 }
 

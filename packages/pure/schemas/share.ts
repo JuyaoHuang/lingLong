@@ -5,5 +5,5 @@ export const shareList = ['weibo', 'x', 'bluesky'] as const
 export const ShareSchema = () =>
   z
     .array(z.enum(shareList))
-    .default(['bluesky'])
+    .default(['x'])
     .describe('Options for sharing content on social media platforms.')
