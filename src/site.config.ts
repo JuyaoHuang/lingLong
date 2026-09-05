@@ -154,7 +154,7 @@ export const integ: IntegrationUserConfig = {
     class: 'prose text-base', // UnoCSS 类名
     // The style of blockquote font `normal` / `italic` (default to italic in typography)
     // 引用块样式: '正常' / '斜体'
-    blockquoteStyle: 'italic',
+    blockquoteStyle: 'normal',
     // The style of inline code block `code` / `modern` (default to code in typography)
     // 行内代码样式: 'code' / 'modern'
     inlineCodeBlockStyle: 'modern'
